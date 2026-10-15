@@ -1,5 +1,6 @@
 add_executable(spectra_audio_tests
     test_buffer.cpp
+    test_analysis.cpp
     test_decoder.cpp
     test_dsp.cpp
     test_fft.cpp

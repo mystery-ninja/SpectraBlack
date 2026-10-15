@@ -7,6 +7,7 @@
 
 add_library(spectra_audio
     backends/ffmpeg/decoder_ffmpeg.cpp
+    src/analysis.cpp
     src/buffer.cpp
     src/dsp.cpp
     src/fft.cpp

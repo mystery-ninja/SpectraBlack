@@ -137,19 +137,19 @@ state. **Done.**
 
 **Independent of Stages 1 and 2.** Can run in parallel.
 
-- [ ] FFmpeg decode of MP3/FLAC/WAV/OGG to interleaved float PCM
+- [x] FFmpeg decode of MP3/FLAC/WAV/OGG to interleaved float PCM
 - [ ] miniaudio playback, ring buffer fed by the decoder
 - [ ] Playback clock, with device latency offset and a user offset
-- [ ] PFFFT integration, 2048-point real FFT
-- [ ] Hann window on input
-- [ ] Offline analysis pass at a fixed 200 Hz hop, chunked across worker threads
-- [ ] Mel band mapping, with linear and log as options
-- [ ] Spectral smoothing across bins, Hamming-weighted
-- [ ] Per-band asymmetric attack/decay
-- [ ] **Spectral tilt compensation** (`Flat` / `Pink` / `Perceptual`) — see the
+- [x] PFFFT integration, 2048-point real FFT
+- [x] Hann window on input
+- [x] Offline analysis pass at a fixed 200 Hz hop, chunked across worker threads
+- [x] Mel band mapping, with linear and log as options
+- [x] Spectral smoothing across bins, Hamming-weighted
+- [x] Per-band asymmetric attack/decay
+- [x] **Spectral tilt compensation** (`Flat` / `Pink` / `Perceptual`) — see the
       bass discussion in [`04-AUDIO-ENGINE.md`](04-AUDIO-ENGINE.md)
-- [ ] Whole-track normalization statistics
-- [ ] `AnalysisFrame` cache, queryable by time with interpolation
+- [x] Whole-track normalization statistics
+- [x] `AnalysisFrame` cache, queryable by time with interpolation
 - [ ] Cache persistence to disk, keyed by audio file content hash
 - [ ] Spectral flux onset detection with a centered adaptive threshold
 - [ ] Tests: sine in the right band, click train at known BPM, silence yields

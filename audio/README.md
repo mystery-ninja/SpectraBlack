@@ -82,3 +82,35 @@ visibly goes wrong without it:
   the top octave off by several dB, which is right for a sound level meter and
   wrong for a display — it dims the cymbals. Avee reaches the same conclusion by
   the same clamp in `DspCurves.myAWeight1000`.
+
+**`analysis.hpp`** — `analyzeFile` and the `AnalysisCache` it produces. The
+whole track, analysed up front at a fixed 200 Hz into bands plus a per-frame
+summary, queryable at any time by interpolation.
+
+### How the pass is split, and why
+
+The obvious parallel decomposition — chunk the track, give each worker a chunk
+with window-sized overlap — does not survive the temporal envelope, which is
+recursive: each frame's value depends on the frame before it. Overlap makes
+the seams *approximately* right, and approximately right is exactly what the
+determinism requirement forbids.
+
+So the split follows what is actually pure rather than what is convenient:
+
+1. **Parallel.** Each frame's spectrum, from its own window of samples and
+   nothing else. Window, FFT, band mapping, tilt, across-band smoothing. No
+   frame reads another, so the work can be divided any way at all.
+2. **Serial, whole-track.** The normalization statistics. Cheap, and it is the
+   thing no live player can do: the intro is scaled against the song rather
+   than against the last two seconds of it.
+3. **Serial, in order.** Normalize, run the envelope, measure the flux.
+   Recursive, so it runs on one thread — and at roughly 12 million steps for a
+   four-minute track, that costs a few hundred milliseconds and buys an answer
+   that is bit-identical at any thread count, by construction.
+
+A four-minute track at the default 256 bands takes about 240 ms on twelve
+cores in a release build, and 630 ms on one.
+
+Windows are centred on their timestamp rather than starting at it. Starting at
+it lags every value by half a window — 23 ms at the defaults, a visible and
+entirely avoidable gap between a kick and the bar that reacts to it.
