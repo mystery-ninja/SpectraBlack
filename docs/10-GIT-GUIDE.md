@@ -89,12 +89,36 @@ The `-u` sets the upstream so future pushes are just `git push`.
 
 ## Our workflow
 
-Since other people will be contributing, we use **branch per change, reviewed via
-pull request**. Nobody commits directly to `main`, including you — not because
-your commits are suspect, but because a protected `main` is what lets CI
-guarantee that `main` always builds.
+**Flat and trust-based.** Everyone with access can create branches and push
+directly, including to `main`. There is no mandatory review and no protected
+branch. We are a small group of people who know each other, and process overhead
+would cost us more than it protects.
 
-### Making a change
+`main` is unprotected deliberately. Once Phase 1 has a working build and CI, we
+will likely require that `main` stays green — but that is a decision for when
+there is something to keep green, not before.
+
+### Pushing straight to main
+
+Fine for documentation, planning, small fixes, and anything unlikely to collide
+with what someone else is doing.
+
+```bash
+git pull                          # always start current
+# ... work ...
+git add docs/BRAINSTORM.md
+git commit -m "docs: add ideas on particle audio binding"
+git push
+```
+
+Pull before you start and pull before you push. That one habit prevents most
+friction when several people share a branch.
+
+### Using a branch
+
+Worth doing when a change is large, will take more than a sitting, touches
+something someone else is also working on, or when you want a second opinion
+before it lands.
 
 ```bash
 git switch main
@@ -108,7 +132,25 @@ git commit -m "core: add driver blend operators"
 git push -u origin feature/spectrum-bars  # publish the branch
 ```
 
-Then open a pull request on GitHub, get a review, and merge.
+From there either open a pull request if you want eyes on it, or merge it
+yourself:
+
+```bash
+git switch main
+git pull
+git merge feature/spectrum-bars
+git push
+git branch -d feature/spectrum-bars       # clean up
+```
+
+A branch is free and deleting one loses nothing, so there is never a reason not
+to make one when in doubt.
+
+### The one rule
+
+**Never force-push a shared branch.** Everything else is recoverable; that is the
+single action that can destroy someone else's work. If you think you need
+`--force`, ask first.
 
 ### Branch naming
 
@@ -202,6 +244,25 @@ git switch other-branch
 git switch -                # back to previous branch
 git stash pop               # restore the shelved changes
 ```
+
+### My push was rejected — "Updates were rejected... fetch first"
+
+**The most common situation on this project**, because we work directly on `main`
+with several people. It means someone else pushed while you were working, so your
+history and the remote's have diverged.
+
+It is not a problem and nothing is broken. Just pull, then push:
+
+```bash
+git pull        # brings their commits in, merging with yours
+git push
+```
+
+If the pull reports a conflict, resolve it as described below and then push.
+
+**Do not** reach for `git push --force` here. It would delete your teammate's
+commits from the remote, and it is the one git mistake in a shared repository
+that genuinely loses other people's work.
 
 ### I have a merge conflict
 

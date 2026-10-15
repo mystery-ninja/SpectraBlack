@@ -73,17 +73,29 @@ cmake --build --preset linux-debug
 ctest --preset linux-debug
 ```
 
-## Pull requests
+## How changes land
+
+The workflow is **flat and trust-based**. If you have push access you can commit
+and branch freely, including on `main`. There is no mandatory review. See
+[`docs/10-GIT-GUIDE.md`](docs/10-GIT-GUIDE.md) for the mechanics.
+
+Use a branch and open a pull request when you *want* feedback, when a change is
+large, or when it touches something someone else is working on. Not because a
+rule says so.
+
+When you do open one:
 
 - One logical change per PR. A PR that fixes a bug and refactors a module is two
   PRs.
 - Describe **why**, not just what. The diff shows what.
 - Include before/after screenshots or a clip for anything visual.
-- CI must be green.
 - Note any change to the project file format explicitly, since those need a
   migration — see [`docs/06-PROJECT-FORMAT.md`](docs/06-PROJECT-FORMAT.md).
 
 Reviews are about the code. Nobody here is their pull request.
+
+The one hard rule: **never force-push a shared branch.** Everything else in git
+is recoverable; that is the single action that destroys other people's work.
 
 ## Performance claims
 
