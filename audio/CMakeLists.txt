@@ -16,6 +16,7 @@ add_library(spectra_audio
     src/fft.cpp
     src/onsets.cpp
     src/playback.cpp
+    src/signal_provider.cpp
 )
 
 add_library(spectra::audio ALIAS spectra_audio)
@@ -27,6 +28,15 @@ target_include_directories(spectra_audio
 target_link_libraries(spectra_audio
     PUBLIC  spectra::core
     PRIVATE spectra::ffmpeg PFFFT::PFFFT spectra::miniaudio spectra::compile_options
+)
+
+# The demonstration of the Stage 3 exit criterion from
+# docs/15-BUILD-ORDER.md. Not a test: it wants a sound card, and its value is
+# in being watched.
+add_executable(spectra_audio_demo examples/analyze.cpp)
+
+target_link_libraries(spectra_audio_demo
+    PRIVATE spectra::audio spectra::compile_options
 )
 
 if(SPECTRA_BUILD_TESTS)
