@@ -30,6 +30,12 @@ target_link_libraries(spectra_gpu
     PRIVATE spectra::compile_options
 )
 
+# GLFW's header includes the system <GL/gl.h> unless told not to. glad
+# declares everything we use, so the system header is both unnecessary and a
+# source of conflicting declarations — and it is not installed on a bare CI
+# runner, which is how this gets noticed.
+target_compile_definitions(spectra_gpu PUBLIC GLFW_INCLUDE_NONE)
+
 # The demo from docs/15-BUILD-ORDER.md Stage 2. Not a test: it needs a real
 # display, and its value is in being looked at.
 add_executable(spectra_gpu_demo examples/quads.cpp)
