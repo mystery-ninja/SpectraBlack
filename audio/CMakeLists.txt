@@ -11,6 +11,7 @@ add_library(spectra_audio
     src/buffer.cpp
     src/dsp.cpp
     src/fft.cpp
+    src/onsets.cpp
 )
 
 add_library(spectra::audio ALIAS spectra_audio)

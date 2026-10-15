@@ -5,6 +5,7 @@ add_executable(spectra_audio_tests
     test_dsp.cpp
     test_fft.cpp
     test_main.cpp
+    test_onsets.cpp
 )
 
 target_link_libraries(spectra_audio_tests

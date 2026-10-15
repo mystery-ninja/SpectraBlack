@@ -2,6 +2,7 @@
 
 #include <spectra/audio/buffer.hpp>
 #include <spectra/audio/dsp.hpp>
+#include <spectra/audio/onsets.hpp>
 #include <spectra/core/result.hpp>
 #include <spectra/core/types.hpp>
 
@@ -84,6 +85,12 @@ struct AnalysisParams {
     EnvelopeTimes mid{.attack = 0.008, .decay = 0.120};
     EnvelopeTimes high{.attack = 0.008, .decay = 0.160};
 
+    OnsetParams onsets;
+
+    /// Time constant of the `beatPulse` signal: how long one detected beat
+    /// keeps driving something after it happens.
+    Seconds pulseDecay{0.18};
+
     /// Workers for the parallel phase. 0 asks the machine.
     ///
     /// Changing this cannot change the result. The pass is split so that
@@ -113,6 +120,12 @@ struct FrameSummary {
     /// Raw onset strength, before any thresholding.
     float flux{0.0f};
 
+    /// The same thing scaled against the track's own flux distribution, so
+    /// that 1.0 is "about as much as ever changes at once in this song".
+    /// Continuous, unlike the discrete beats — useful for driving something
+    /// by how busy the music is rather than by its pulse.
+    float beat{0.0f};
+
     std::uint16_t peakBand{0};
 };
 
@@ -124,6 +137,7 @@ struct AnalysisSample {
     float mid{0.0f};
     float high{0.0f};
     float flux{0.0f};
+    float beat{0.0f};
     float peakBand{0.0f};  ///< Normalized to 0..1 across the band count.
 };
 
@@ -164,6 +178,28 @@ public:
 
     [[nodiscard]] AnalysisSample at(Seconds t) const;
 
+    [[nodiscard]] std::span<const Beat> beats() const { return beats_; }
+
+    /// Index of the beat containing `t`, counting from 0 at the first beat
+    /// and negative before it.
+    ///
+    /// An index rather than a time because it seeds the shaping chain's
+    /// random stage: a random value has to stay put for the whole beat and
+    /// has to be the same when you scrub back to it.
+    [[nodiscard]] std::int64_t beatIndexAt(Seconds t) const;
+
+    /// A spike at each beat, decaying with `params.pulseDecay`, scaled by how
+    /// hard the hit was. The signal most reactions actually want.
+    [[nodiscard]] float beatPulseAt(Seconds t) const;
+
+    /// Position within the current beat, ramping 0 to 1.
+    ///
+    /// The one Avee has no equivalent for, and the reason it cannot do
+    /// motion that is locked to the grid rather than merely twitching at it.
+    /// Before the first beat, and after the last, it keeps running on the
+    /// nearest known interval rather than freezing.
+    [[nodiscard]] float beatPhaseAt(Seconds t) const;
+
 private:
     friend Result<AnalysisCache> analyze(const AudioBuffer&, const AnalysisParams&);
 
@@ -171,6 +207,7 @@ private:
     BandLayout layout_;
     std::vector<float> bands_;  ///< frameCount_ * bandCount, frame-major.
     std::vector<FrameSummary> summaries_;
+    std::vector<Beat> beats_;
     int frameCount_{0};
     Seconds duration_{0.0};
 };

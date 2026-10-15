@@ -71,10 +71,29 @@ std::uint64_t hashBytes(std::uint64_t seed, const void* data, std::size_t size) 
     return seed;
 }
 
+/// Deliberately restricted to scalars.
+///
+/// Hashing a struct wholesale reads its padding, which is never initialised,
+/// so two parameter sets that compare equal hash differently and the disk
+/// cache never hits. Requiring one call per field makes that impossible
+/// rather than merely unlikely.
 template<typename T>
 std::uint64_t hashValue(std::uint64_t seed, const T& value) {
-    static_assert(std::is_trivially_copyable_v<T>);
+    static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>,
+                  "hash fields, not structs: padding is not zeroed");
     return hashBytes(seed, &value, sizeof(value));
+}
+
+std::uint64_t hashEnvelope(std::uint64_t seed, const EnvelopeTimes& times) {
+    seed = hashValue(seed, times.attack);
+    return hashValue(seed, times.decay);
+}
+
+std::uint64_t hashOnsets(std::uint64_t seed, const OnsetParams& onsets) {
+    seed = hashValue(seed, onsets.window);
+    seed = hashValue(seed, onsets.sensitivity);
+    seed = hashValue(seed, onsets.minimumInterval);
+    return hashValue(seed, onsets.floor);
 }
 
 }  // namespace
@@ -120,9 +139,11 @@ std::uint64_t AnalysisParams::hash() const {
     seed = hashValue(seed, smoothingRadius);
     seed = hashValue(seed, normalization);
     seed = hashValue(seed, gain);
-    seed = hashValue(seed, bass);
-    seed = hashValue(seed, mid);
-    seed = hashValue(seed, high);
+    seed = hashEnvelope(seed, bass);
+    seed = hashEnvelope(seed, mid);
+    seed = hashEnvelope(seed, high);
+    seed = hashOnsets(seed, onsets);
+    seed = hashValue(seed, pulseDecay);
     // threadCount is deliberately absent. It cannot change the result, and
     // including it would throw the cache away when a project moves machines.
     return seed;
@@ -224,11 +245,61 @@ AnalysisSample AnalysisCache::at(Seconds t) const {
         .mid = lerp(lower.mid, upper.mid),
         .high = lerp(lower.high, upper.high),
         .flux = lerp(lower.flux, upper.flux),
+        .beat = lerp(lower.beat, upper.beat),
         // Not interpolated: the loudest band jumping from 3 to 90 does not
         // pass through 46, and a value that slides across the whole spectrum
         // on every transient is worse than one that snaps.
         .peakBand = static_cast<float>(lower.peakBand) / bands,
     };
+}
+
+std::int64_t AnalysisCache::beatIndexAt(Seconds t) const {
+    if (beats_.empty()) {
+        return -1;
+    }
+
+    // The first beat at or after t; the one we are inside is the one before.
+    const auto next =
+        std::upper_bound(beats_.begin(), beats_.end(), t, [](Seconds time, const Beat& beat) {
+            return time < beat.time;
+        });
+    return std::distance(beats_.begin(), next) - 1;
+}
+
+float AnalysisCache::beatPulseAt(Seconds t) const {
+    const std::int64_t index = beatIndexAt(t);
+    if (index < 0) {
+        return 0.0f;
+    }
+
+    const Beat& beat = beats_[static_cast<std::size_t>(index)];
+    if (!(params_.pulseDecay > 0.0)) {
+        return beat.strength;
+    }
+    return beat.strength * static_cast<float>(std::exp(-(t - beat.time) / params_.pulseDecay));
+}
+
+float AnalysisCache::beatPhaseAt(Seconds t) const {
+    if (beats_.size() < 2) {
+        return 0.0f;
+    }
+
+    const std::int64_t index = beatIndexAt(t);
+
+    // Outside the detected range the grid is extrapolated on the nearest
+    // known interval rather than frozen, so an intro before the first
+    // detected hit still moves instead of sitting at zero.
+    const auto clamped = static_cast<std::size_t>(
+        std::clamp<std::int64_t>(index, 0, static_cast<std::int64_t>(beats_.size()) - 2));
+
+    const Seconds start = beats_[clamped].time;
+    const Seconds interval = beats_[clamped + 1].time - start;
+    if (!(interval > 0.0)) {
+        return 0.0f;
+    }
+
+    const double phase = (t - start) / interval;
+    return static_cast<float>(phase - std::floor(phase));
 }
 
 Result<AnalysisCache> analyze(const AudioBuffer& audio, const AnalysisParams& params) {
@@ -467,6 +538,29 @@ Result<AnalysisCache> analyze(const AudioBuffer& audio, const AnalysisParams& pa
         summary.bass = bassSum / bassBands;
         summary.mid = midSum / midBands;
         summary.high = highSum / highBands;
+    }
+
+    // Phase 4: beats. Peak-picking against a centred adaptive threshold,
+    // which is the one detector improvement that comes free from analysing
+    // offline — the threshold at a given moment is allowed to know what
+    // happens just after it.
+    std::vector<float> flux(static_cast<std::size_t>(frameCount));
+    for (int frame = 0; frame < frameCount; ++frame) {
+        flux[static_cast<std::size_t>(frame)] =
+            cache.summaries_[static_cast<std::size_t>(frame)].flux;
+    }
+    cache.beats_ = detectOnsets(flux, params.rate, params.onsets);
+
+    // The continuous companion to the discrete beats: flux scaled against
+    // this track's own distribution, so 1.0 means "about as much as ever
+    // changes at once in this song".
+    std::vector<float> fluxCopy = flux;
+    const float fluxReference = percentile(fluxCopy, kReferencePercentile);
+    if (fluxReference > kFloor) {
+        for (int frame = 0; frame < frameCount; ++frame) {
+            FrameSummary& summary = cache.summaries_[static_cast<std::size_t>(frame)];
+            summary.beat = std::min(summary.flux / fluxReference, 1.0f);
+        }
     }
 
     return Result<AnalysisCache>::ok(std::move(cache));

@@ -114,3 +114,18 @@ cores in a release build, and 630 ms on one.
 Windows are centred on their timestamp rather than starting at it. Starting at
 it lags every value by half a window — 23 ms at the defaults, a visible and
 entirely avoidable gap between a kick and the bar that reacts to it.
+
+**`onsets.hpp`** — `detectOnsets`, spectral flux peak-picking against a
+*centred* adaptive median threshold. Centred is the part that matters and the
+part only an offline detector can have: the threshold at 1:04 is allowed to
+know what happens at 1:04.25, so the first hit after a quiet passage is not
+late the way a realtime detector's always is.
+
+It is a free function over the flux envelope rather than a method on the
+cache, because the interesting failures — a click train found at half tempo, a
+fade-out found as a drum solo — are far easier to provoke by writing the
+envelope directly than by synthesising audio that produces it.
+
+From the detected beats the cache offers `beatIndexAt`, `beatPulseAt` and
+`beatPhaseAt`. The last is the one Avee has no equivalent for, and the reason
+it cannot do motion locked to the grid rather than merely twitching at it.
