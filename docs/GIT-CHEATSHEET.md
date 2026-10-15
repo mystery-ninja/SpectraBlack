@@ -30,9 +30,14 @@ anyone forever, so this matters.
 ```bash
 # Sensible defaults
 git config --global init.defaultBranch main
-git config --global pull.ff only
+git config --global pull.rebase false
 git config --global alias.lg "log --oneline --graph --decorate --all"
 ```
+
+`pull.rebase false` means that when you and someone else have both committed,
+`git pull` quietly makes a merge commit instead of refusing. Since we all push to
+`main`, that happens often, and this is what makes `git pull` just work. It never
+rewrites history, so it cannot lose anyone's commits.
 
 Then get the project:
 
@@ -224,6 +229,17 @@ git push
 ```
 
 Do **not** use `--force` here.
+
+If `git pull` *also* refuses, saying something about diverging branches and not
+being able to fast-forward, it means you both made commits. Merge them:
+
+```bash
+git merge --no-edit origin/main
+git push
+```
+
+Setting `pull.rebase false` from section 1 makes git do this for you
+automatically, so you should rarely see it.
 
 ### I have a merge conflict
 

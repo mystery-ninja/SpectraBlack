@@ -55,8 +55,9 @@ git config --global user.email "you@example.com"
 # Make 'main' the default branch name for new repos
 git config --global init.defaultBranch main
 
-# Only fast-forward or create a merge commit on pull — avoids surprise rebases
-git config --global pull.ff only
+# Merge (never rebase) when pulling diverged work. Since we all push to main,
+# this is what lets `git pull` work without manual intervention.
+git config --global pull.rebase false
 
 # Nicer log output, as `git lg`
 git config --global alias.lg "log --oneline --graph --decorate --all"
