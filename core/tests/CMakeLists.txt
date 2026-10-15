@@ -1,8 +1,11 @@
 add_executable(spectra_core_tests
     test_drivers.cpp
+    test_evalplan.cpp
     test_keyframes.cpp
     test_main.cpp
+    test_node.cpp
     test_property.cpp
+    test_serialization.cpp
     test_version.cpp
 )
 

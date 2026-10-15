@@ -73,29 +73,24 @@ app and the most important code in the project.
 - [x] `Property<T>` — static value, keyframe track, driver list
 - [x] `Keyframe<T>` and `KeyframeTrack<T>` with `Hold`, `Linear`, `Bezier`
 - [x] Keyframe evaluation at arbitrary `t`, with bezier handles
-- [ ] `Node` base + `Group`/`Composition` containers; the tree
-- [ ] `PropertyRegistry` and `describe()` — the declarative property system
+- [x] `Node` base + `Group`/`Composition` containers; the tree
+- [x] `PropertyRegistry` and `describe()` — the declarative property system
 - [x] `Driver` struct: signal reference, shaping chain, amount, blend op
 - [x] Blend operators: `Add`, `Multiply`, `Replace`, `Max`, `Min`
 - [x] Shaping chain: remap, curve, attack/decay, delay, seeded random
-- [ ] Evaluator: flatten the tree into `EvalPlan`, evaluate to a flat output array
-- [ ] JSON serialization, round-trip lossless
-- [ ] Unknown-key and unknown-node-type preservation
+- [x] Evaluator: flatten the tree into `EvalPlan`, evaluate to a flat output array
+- [x] JSON serialization, round-trip lossless
+- [x] Unknown-key and unknown-node-type preservation
       ([`06-PROJECT-FORMAT.md`](06-PROJECT-FORMAT.md))
-- [ ] `Command` stack: apply, revert, `mergeWith` coalescing
-- [x] Tests for everything landed so far (54 cases)
-
-The checked items above are the **property evaluation path**: you can build a
-property in code, give it keyframes and audio drivers, and evaluate it at any
-time. What remains is the **scene** around it — the node tree, the declarative
-registry, the flattened evaluator, save/load, and undo.
+- [x] `Command` stack: apply, revert, `mergeWith` coalescing
+- [x] Tests for everything (106 cases)
 
 Audio signals are **stubbed** here — a driver asks for `bass` and gets a fake
 sine wave. That is enough to prove the whole evaluation path, and it keeps Stage 1
-independent of Stage 3.
+independent of Stage 3. Stage 4 swaps the stub for the real analysis cache.
 
 **Exit:** you can build a scene in code, evaluate every property at any `t`, save
-it, reload it, and undo an edit — all headless, all tested, no window.
+it, reload it, and undo an edit — all headless, all tested, no window. **Done.**
 
 ---
 

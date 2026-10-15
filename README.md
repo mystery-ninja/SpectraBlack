@@ -18,9 +18,12 @@ audio, which is exactly the intersection this app occupies. **Black** is the
 suffix for *complete* — in the sense of a black belt, and of the empty canvas
 the visuals emerge from.
 
-> **Status: planning only.** There is no code yet, by design. We are writing the
-> documentation and the architecture down first so that the people joining this
-> project are building toward the same thing.
+> **Status: Stage 1 complete.** The documentation and architecture were written
+> first, so that the people joining this project build toward the same thing.
+> The headless core — properties, keyframes, audio drivers, the node tree,
+> save/load and undo — now exists and is tested. Next up are the renderer and
+> the audio engine, which can be built in parallel. See
+> [`docs/15-BUILD-ORDER.md`](docs/15-BUILD-ORDER.md).
 
 ## Targets
 

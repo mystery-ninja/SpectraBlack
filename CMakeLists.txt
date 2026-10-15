@@ -75,6 +75,15 @@ FetchContent_Declare(glm
 )
 FetchContent_MakeAvailable(glm)
 
+# nlohmann/json — the project file format. Core, not a test-only dependency.
+FetchContent_Declare(nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.12.0
+    GIT_SHALLOW    TRUE
+)
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+FetchContent_MakeAvailable(nlohmann_json)
+
 if(SPECTRA_BUILD_TESTS)
     FetchContent_Declare(doctest
         GIT_REPOSITORY https://github.com/doctest/doctest.git

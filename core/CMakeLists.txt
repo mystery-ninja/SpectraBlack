@@ -5,7 +5,13 @@
 
 add_library(spectra_core
     src/blend.cpp
+    src/command.cpp
+    src/evalplan.cpp
     src/interpolation.cpp
+    src/node.cpp
+    src/registry.cpp
+    src/scene.cpp
+    src/serialization.cpp
     src/shaping.cpp
     src/signal.cpp
     src/version.cpp
@@ -18,7 +24,7 @@ target_include_directories(spectra_core
 )
 
 target_link_libraries(spectra_core
-    PUBLIC  glm::glm
+    PUBLIC  glm::glm nlohmann_json::nlohmann_json
     PRIVATE spectra::compile_options
 )
 
