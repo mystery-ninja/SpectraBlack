@@ -57,14 +57,28 @@ editor. The reasoning behind each of those is in
 | [10-GIT-GUIDE.md](docs/10-GIT-GUIDE.md) | Git from scratch, plus our branching and review workflow |
 | [11-NAMING-AND-LICENSE.md](docs/11-NAMING-AND-LICENSE.md) | Name candidates and the license decision, with tradeoffs |
 
-## Reference material on this machine
+## Team
 
-Neither of these ships with the project. They are research material only.
+| | Role |
+|---|---|
+| **MysterY** ([@mystery-ninja](https://github.com/mystery-ninja)) | Project lead, architecture |
+| **Schxma** ([@tlgkxd123](https://github.com/tlgkxd123)) | Core development |
 
-- `/media/mystery/MysterYFile/Avee Player/avee-re-master` — decompiled Avee
-  Player 1.2.101, readable Java. This is our primary architectural reference.
-- `~/AeNux` — After Effects under a bundled Wine prefix. Binaries only, so it is
-  a reference for *interaction design*, nothing more.
+We fail together and we succeed together. Everyone here has push access and the
+workflow is flat by design — see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+Want in? Open an issue or start a [discussion](https://github.com/mystery-ninja/SpectraBlack/discussions).
+
+## Reference material
+
+Neither of these ships with the project. They are research material only, held
+locally and never committed.
+
+- **Avee Player 1.2.101**, decompiled to readable Java. Our primary architectural
+  reference; the teardown is in
+  [`docs/09-AVEE-TEARDOWN.md`](docs/09-AVEE-TEARDOWN.md).
+- **After Effects** under a Wine prefix. Binaries only, so it is a reference for
+  *interaction design* and nothing more.
 
 ## License
 
