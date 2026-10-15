@@ -59,6 +59,7 @@ editor. The reasoning behind each of those is in
 | [12-AEP-COMPATIBILITY.md](docs/12-AEP-COMPATIBILITY.md) | Scoped import of After Effects projects, the fidelity limits, and the zipped-archive path |
 | [13-EXTENSIBILITY.md](docs/13-EXTENSIBILITY.md) | Property expressions, scriptable effect nodes, and editor extensions — with the determinism and sandbox rules |
 | [14-VIZ-COMPATIBILITY.md](docs/14-VIZ-COMPATIBILITY.md) | Import of Avee `.viz` projects — easier than the AE path and aimed at our beachhead audience |
+| [15-BUILD-ORDER.md](docs/15-BUILD-ORDER.md) | **Picking up a task? Start here.** What to build in what order, and who can work in parallel |
 
 ### References (read any time)
 
