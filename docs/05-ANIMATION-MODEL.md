@@ -181,6 +181,10 @@ Lua or a small purpose-built expression language, not JavaScript. And it must
 compile to the same evaluated-property representation as everything else so the
 render path does not need to know the difference.
 
+The full design — expressions as a property source, the language choice,
+cross-property dependency graphs, and how they relate to the scriptable effects
+and editor extensions — is in [`13-EXTENSIBILITY.md`](13-EXTENSIBILITY.md).
+
 ## Evaluation performance
 
 The evaluator runs on every property of every node every frame, so its structure

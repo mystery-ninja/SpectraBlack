@@ -79,15 +79,19 @@ That is the real test and no internal metric substitutes for it.
 
 Speculative, ordered by likely value:
 
-- Expression language (sandboxed, deterministic — see
-  [`05-ANIMATION-MODEL.md`](05-ANIMATION-MODEL.md))
+- Extensibility, in three tiers — property expressions, scriptable effect nodes
+  (shader + manifest), and editor extensions. Sandboxed and deterministic on the
+  render path. See [`13-EXTENSIBILITY.md`](13-EXTENSIBILITY.md), which absorbs the
+  old "expression language", "plugin API for custom nodes and shaders", and
+  "shader node with live GLSL editing" items
 - 2.5D camera with Z-positioned layers
 - Masks and track mattes
-- Plugin API for custom nodes and shaders
 - MIDI and stem-based input, so reactions come from individual instruments
   rather than a mixed spectrum. Potentially the most interesting feature in the
   entire project, since it is the one no competitor can easily copy
-- Shader node with live GLSL editing
+- After Effects project import — scoped `.aepx` subset plus an optional AE-side
+  exporter script, gated behind a research spike. See
+  [`12-AEP-COMPATIBILITY.md`](12-AEP-COMPATIBILITY.md)
 
 ## Time
 

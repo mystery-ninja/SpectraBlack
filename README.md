@@ -56,6 +56,8 @@ editor. The reasoning behind each of those is in
 | [09-AVEE-TEARDOWN.md](docs/09-AVEE-TEARDOWN.md) | What we learned from the Avee Player source, and what to copy |
 | [10-GIT-GUIDE.md](docs/10-GIT-GUIDE.md) | Git from scratch, plus our branching and review workflow |
 | [11-NAMING-AND-LICENSE.md](docs/11-NAMING-AND-LICENSE.md) | Name candidates and the license decision, with tradeoffs |
+| [12-AEP-COMPATIBILITY.md](docs/12-AEP-COMPATIBILITY.md) | Scoped import of After Effects projects, the fidelity limits, and the zipped-archive path |
+| [13-EXTENSIBILITY.md](docs/13-EXTENSIBILITY.md) | Property expressions, scriptable effect nodes, and editor extensions — with the determinism and sandbox rules |
 
 ### References (read any time)
 
