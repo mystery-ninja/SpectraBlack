@@ -191,6 +191,21 @@ if(SPECTRA_ENABLE_AUDIO)
     # SYSTEM: libav* headers do not survive -Wall -Wextra -Werror, and that is
     # not their job.
     target_include_directories(spectra_ffmpeg SYSTEM INTERFACE ${FFMPEG_INCLUDE_DIRS})
+
+    # PFFFT — real-input FFT, SIMD, small enough to read in an afternoon.
+    # This is the maintained fork of Julien Pommier's original; the upstream
+    # lives in a Mercurial repository that FetchContent cannot reach.
+    set(PFFFT_USE_TYPE_DOUBLE OFF CACHE BOOL "" FORCE)
+    set(INSTALL_PFFFT         OFF CACHE BOOL "" FORCE)
+    set(PFFFT_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
+    set(PFFFT_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
+    set(PFFFT_BUILD_EXAMPLES  OFF CACHE BOOL "" FORCE)
+    FetchContent_Declare(pffft
+        GIT_REPOSITORY https://github.com/marton78/pffft.git
+        GIT_TAG        aa16fd3db58de4ba5dae8b0438440bb9da46b6fa
+        GIT_SUBMODULES ""  # the benchmark comparisons against other FFTs
+    )
+    FetchContent_MakeAvailable(pffft)
 endif()
 
 # ---------------------------------------------------------------------------

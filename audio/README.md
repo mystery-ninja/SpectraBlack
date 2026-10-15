@@ -56,3 +56,29 @@ plain average. FFmpeg's own stereo-to-mono matrix is `1/sqrt(2)` per channel,
 which is energy-preserving and adds 3 dB to anything panned centre; a correct
 choice, but not the same choice, and two definitions of "mono" in one program
 is a bug with a long fuse.
+
+**`fft.hpp`** — `RealFft`, forward only, over PFFFT. The wrapper exists because
+PFFFT wants SIMD-aligned buffers, its own scratch, and a packing where the
+Nyquist bin rides in the imaginary part of bin zero. One instance per worker
+thread; instances are independent.
+
+**`dsp.hpp`** — the primitives, all pure functions: window shapes and their
+coherent gains, band layouts in linear/log/mel, FFT-bins-to-bands mapping,
+the Hamming smoothing kernel, the asymmetric attack/decay follower, and
+spectral tilt.
+
+Three of those are worth singling out, because each fixes something that
+visibly goes wrong without it:
+
+- **Bands narrower than a bin interpolate** rather than averaging nothing. At a
+  2048-point window the bottom thirty bands of a 128-band log layout are each
+  narrower than one FFT bin, and "average the bins inside this band" finds none
+  of them. The result is a comb of dead slots at the left of the display, which
+  users correctly read as missing bass.
+- **Envelope coefficients are given in seconds**, converted against the fixed
+  analysis rate. Avee's equivalents are per rendered frame, so the same project
+  decays differently on a slower machine.
+- **Perceptual tilt is A-weighting clamped at 1 kHz.** The full curve also rolls
+  the top octave off by several dB, which is right for a sound level meter and
+  wrong for a display — it dims the cymbals. Avee reaches the same conclusion by
+  the same clamp in `DspCurves.myAWeight1000`.

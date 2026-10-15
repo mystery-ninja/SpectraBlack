@@ -8,6 +8,8 @@
 add_library(spectra_audio
     backends/ffmpeg/decoder_ffmpeg.cpp
     src/buffer.cpp
+    src/dsp.cpp
+    src/fft.cpp
 )
 
 add_library(spectra::audio ALIAS spectra_audio)
@@ -18,7 +20,7 @@ target_include_directories(spectra_audio
 
 target_link_libraries(spectra_audio
     PUBLIC  spectra::core
-    PRIVATE spectra::ffmpeg spectra::compile_options
+    PRIVATE spectra::ffmpeg PFFFT::PFFFT spectra::compile_options
 )
 
 if(SPECTRA_BUILD_TESTS)
