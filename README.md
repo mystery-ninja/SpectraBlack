@@ -40,6 +40,42 @@ rendering abstraction, FFmpeg for decode and encode, Dear ImGui for the desktop
 editor. The reasoning behind each of those is in
 [`docs/02-TECH-STACK.md`](docs/02-TECH-STACK.md).
 
+## Building
+
+```bash
+cmake --preset linux-debug
+cmake --build --preset linux-debug
+ctest --preset linux-debug
+```
+
+Requires CMake 3.24+, Ninja, and a C++20 compiler (GCC 13+, Clang 16+, or
+MSVC 19.3x). Dependencies are fetched automatically.
+
+```bash
+sudo apt install cmake ninja-build clang-format clang-tidy
+```
+
+The GPU, audio, and editor modules are **off by default** so a fresh clone
+builds in seconds. Turn them on as the matching stage of
+[`docs/15-BUILD-ORDER.md`](docs/15-BUILD-ORDER.md) begins:
+
+| Option | Default | Enables |
+|---|---|---|
+| `SPECTRA_ENABLE_GPU` | `OFF` | The renderer; fetches GLFW (Stage 2) |
+| `SPECTRA_ENABLE_AUDIO` | `OFF` | Decode, playback, analysis; needs FFmpeg (Stage 3) |
+| `SPECTRA_ENABLE_APP` | `OFF` | The desktop editor (Stage 5) |
+| `SPECTRA_BUILD_TESTS` | `ON` | Unit tests |
+
+Other presets: `linux-asan` (ASan + UBSan), `linux-release`, `linux-ci`
+(warnings as errors), `windows-debug`, `windows-release`.
+
+Before pushing, run the two checks CI runs:
+
+```bash
+./scripts/check-core-deps.sh                        # architecture guard
+clang-format -i $(git ls-files '*.cpp' '*.hpp')     # formatting
+```
+
 ## Read the docs in this order
 
 | Doc | What it covers |

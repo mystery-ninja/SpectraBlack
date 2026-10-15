@@ -1,0 +1,50 @@
+---
+Language:        Cpp
+BasedOnStyle:    LLVM
+Standard:        c++20
+
+ColumnLimit:     100
+IndentWidth:     4
+TabWidth:        4
+UseTab:          Never
+
+AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+BreakBeforeBraces: Attach
+BreakConstructorInitializers: BeforeColon
+ConstructorInitializerIndentWidth: 4
+Cpp11BracedListStyle: true
+EmptyLineBeforeAccessModifier: LogicalBlock
+FixNamespaceComments: true
+IncludeBlocks:   Regroup
+IncludeCategories:
+  # Our own headers first
+  - Regex:           '^"'
+    Priority:        1
+  # spectra module headers
+  - Regex:           '^<spectra/'
+    Priority:        2
+  # Third-party
+  - Regex:           '^<(glad|GLFW|glm|doctest|nlohmann)/'
+    Priority:        3
+  # Standard library
+  - Regex:           '^<[a-z_]+>$'
+    Priority:        4
+  - Regex:           '.*'
+    Priority:        5
+IndentCaseLabels: true
+IndentPPDirectives: AfterHash
+KeepEmptyLinesAtTheStartOfBlocks: false
+NamespaceIndentation: None
+PointerAlignment: Left
+ReferenceAlignment: Left
+SeparateDefinitionBlocks: Always
+SortIncludes:    CaseSensitive
+SpaceAfterTemplateKeyword: false
+SpacesBeforeTrailingComments: 2

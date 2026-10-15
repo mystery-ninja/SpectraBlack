@@ -1,0 +1,97 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 24, "patch": 0 },
+
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "SPECTRA_BUILD_TESTS": "ON"
+      }
+    },
+
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "description": "Default development build",
+      "inherits": "base",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "linux-asan",
+      "displayName": "Linux Debug + ASan/UBSan",
+      "description": "Catches more real bugs than any amount of code review",
+      "inherits": "linux-debug",
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined"
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux Release",
+      "inherits": "base",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "linux-ci",
+      "displayName": "Linux CI",
+      "description": "Strict: warnings are errors",
+      "inherits": "linux-debug",
+      "cacheVariables": {
+        "SPECTRA_WARNINGS_AS_ERRORS": "ON"
+      }
+    },
+
+    {
+      "name": "windows-debug",
+      "displayName": "Windows Debug",
+      "inherits": "base",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "windows-release",
+      "displayName": "Windows Release",
+      "inherits": "base",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    { "name": "linux-debug",   "configurePreset": "linux-debug" },
+    { "name": "linux-asan",    "configurePreset": "linux-asan" },
+    { "name": "linux-release", "configurePreset": "linux-release" },
+    { "name": "linux-ci",      "configurePreset": "linux-ci" },
+    { "name": "windows-debug", "configurePreset": "windows-debug" },
+    { "name": "windows-release","configurePreset": "windows-release" }
+  ],
+
+  "testPresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error", "stopOnFailure": false }
+    },
+    { "name": "linux-debug",   "configurePreset": "linux-debug",   "inherits": "base" },
+    { "name": "linux-asan",    "configurePreset": "linux-asan",    "inherits": "base" },
+    { "name": "linux-release", "configurePreset": "linux-release", "inherits": "base" },
+    { "name": "linux-ci",      "configurePreset": "linux-ci",      "inherits": "base" },
+    { "name": "windows-debug", "configurePreset": "windows-debug", "inherits": "base" }
+  ]
+}

@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The job that actually protects the architecture. Everything else is
+  # conventional. See docs/01-ARCHITECTURE.md.
+  architecture:
+    name: Architecture guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: core/ must not depend on GPU, OS, UI, or I/O
+        run: ./scripts/check-core-deps.sh
+
+  format:
+    name: Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang-format
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+      - name: Check formatting
+        run: |
+          files=$(git ls-files '*.cpp' '*.hpp' '*.h')
+          if [ -z "$files" ]; then
+            echo "No C++ files yet, nothing to check"
+            exit 0
+          fi
+          clang-format --dry-run --Werror $files
+
+  linux:
+    name: Linux (GCC, Debug)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build
+
+      - name: Configure
+        run: cmake --preset linux-ci
+
+      - name: Build
+        run: cmake --build --preset linux-ci
+
+      - name: Test
+        run: ctest --preset linux-ci
+
+  windows:
+    name: Windows (MSVC, Debug)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure
+        run: cmake --preset windows-debug
+
+      - name: Build
+        run: cmake --build --preset windows-debug
+
+      - name: Test
+        run: ctest --preset windows-debug
