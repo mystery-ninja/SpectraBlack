@@ -150,7 +150,7 @@ state. **Done.**
       bass discussion in [`04-AUDIO-ENGINE.md`](04-AUDIO-ENGINE.md)
 - [x] Whole-track normalization statistics
 - [x] `AnalysisFrame` cache, queryable by time with interpolation
-- [ ] Cache persistence to disk, keyed by audio file content hash
+- [x] Cache persistence to disk, keyed by audio file content hash
 - [x] Spectral flux onset detection with a centered adaptive threshold
 - [ ] Tests: sine in the right band, click train at known BPM, silence yields
       zeros not NaNs, identical output across thread counts

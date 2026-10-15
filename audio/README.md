@@ -129,3 +129,20 @@ envelope directly than by synthesising audio that produces it.
 From the detected beats the cache offers `beatIndexAt`, `beatPulseAt` and
 `beatPhaseAt`. The last is the one Avee has no equivalent for, and the reason
 it cannot do motion locked to the grid rather than merely twitching at it.
+
+**`cache_file.hpp`** — `analyzeFileCached`, and the on-disk format behind it.
+Both the audio's content hash and the parameter hash are in the filename, so a
+stale cache is never read: it simply is not the file we look for. Flipping a
+setting back and forth is therefore free rather than two recomputes.
+
+For a four-minute track the numbers are 237 ms to analyse, 14 ms to write,
+27 ms to read, and 48 MB on disk. That is full `float32`, not the `float16`
+[`docs/04-AUDIO-ENGINE.md`](../docs/04-AUDIO-ENGINE.md) estimated with:
+halving the file would make a loaded cache differ from a fresh analysis, and
+then whether preview and export agreed would depend on whether the cache
+happened to be warm.
+
+The file is written beside its target and renamed into place, because the
+hashes in the name cannot catch a torn write — the name would be right and
+only the contents wrong. A cache that cannot be written is not an error; a
+project opened from read-only media should cost speed, not function.

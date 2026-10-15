@@ -202,6 +202,10 @@ public:
 
 private:
     friend Result<AnalysisCache> analyze(const AudioBuffer&, const AnalysisParams&);
+    friend Result<bool>
+    writeAnalysisCache(const std::filesystem::path&, const AnalysisCache&, std::uint64_t);
+    friend Result<AnalysisCache>
+    readAnalysisCache(const std::filesystem::path&, const AnalysisParams&, std::uint64_t);
 
     AnalysisParams params_;
     BandLayout layout_;
@@ -223,5 +227,14 @@ private:
 /// Decodes at the right rate and analyses. The usual entry point.
 [[nodiscard]] Result<AnalysisCache> analyzeFile(const std::filesystem::path& path,
                                                 const AnalysisParams& params = {});
+
+// Declared here so that AnalysisCache can befriend them. Defined in
+// cache_file.hpp, which is where anyone looking for them would look.
+[[nodiscard]] Result<bool> writeAnalysisCache(const std::filesystem::path& path,
+                                              const AnalysisCache& cache,
+                                              std::uint64_t audioHash);
+[[nodiscard]] Result<AnalysisCache> readAnalysisCache(const std::filesystem::path& path,
+                                                      const AnalysisParams& params,
+                                                      std::uint64_t audioHash);
 
 }  // namespace spectra::audio
