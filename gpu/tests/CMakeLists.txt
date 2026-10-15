@@ -1,7 +1,9 @@
 add_executable(spectra_gpu_tests
     test_device_gl.cpp
     test_framegraph.cpp
+    test_image.cpp
     test_main.cpp
+    test_quad_renderer_gl.cpp
     test_shader_source.cpp
     test_target_pool.cpp
     test_types.cpp

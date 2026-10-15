@@ -98,22 +98,32 @@ it, reload it, and undo an edit — all headless, all tested, no window. **Done.
 
 **Independent of Stage 1.** Can run in parallel.
 
-- [ ] GLFW window with a GL 4.3 core context
-- [ ] glad loader
-- [ ] RHI handles: `TextureHandle`, `ShaderHandle`, `BufferHandle`,
+- [x] GLFW window with a GL 4.3 core context
+- [x] glad loader
+- [x] RHI handles: `TextureHandle`, `ShaderHandle`, `BufferHandle`,
       `FramebufferHandle`
-- [ ] Shader compile and link, with the `#version` cross-platform shim
-- [ ] `#include` resolution in shader sources
-- [ ] Vertex buffers, persistent mapped
-- [ ] Textures, with `stb_image` loading
-- [ ] Framebuffers, `RGBA16F`, linear color
-- [ ] The six blend modes from [`03-RENDER-ENGINE.md`](03-RENDER-ENGINE.md)
-- [ ] Fullscreen quad, and a textured quad with transform
-- [ ] Frame graph: pass list, dependency ordering, render target pooling
-- [ ] sRGB conversion at final output
+- [x] Shader compile and link, with the `#version` cross-platform shim
+- [x] `#include` resolution in shader sources
+- [x] Vertex buffers, persistent mapped
+- [x] Textures, with `stb_image` loading
+- [x] Framebuffers, `RGBA16F`, linear color
+- [x] The six blend modes from [`03-RENDER-ENGINE.md`](03-RENDER-ENGINE.md)
+- [x] Fullscreen quad, and a textured quad with transform
+- [x] Frame graph: pass list, dependency ordering, render target pooling
+- [x] sRGB conversion at final output
+
+Run `spectra_gpu_demo` to see it. It prints its frame rate and its cumulative
+target allocations, which is how the exit criterion below is checked rather
+than assumed.
+
+Tests needing a GL context report themselves skipped where there is no
+display, so CI covers the preprocessor, the frame graph and the pool, and a
+developer with a GPU gets the rest. Headless EGL on CI is still worth doing
+when golden-image tests arrive.
 
 **Exit:** a window showing textured quads compositing with correct blend modes in
-linear color at a stable 60fps, with zero GL allocation per frame in steady state.
+linear color at a stable 60fps, with zero GL allocation per frame in steady
+state. **Done.**
 
 ---
 

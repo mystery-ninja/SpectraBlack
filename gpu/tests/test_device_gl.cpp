@@ -1,14 +1,11 @@
-// Tests that need a real GL 4.3 context.
-//
-// They create a hidden window, and report themselves as skipped when that is
-// not possible — CI runners have no display. A developer with a GPU runs the
-// full set, which is where the coverage that matters actually comes from.
+// Device tests that need a real GL 4.3 context. See gl_fixture.hpp.
+
+#include "gl_fixture.hpp"
 
 #include <spectra/gpu/device.hpp>
 #include <spectra/gpu/framegraph.hpp>
 #include <spectra/gpu/shader_source.hpp>
 #include <spectra/gpu/target_pool.hpp>
-#include <spectra/gpu/window.hpp>
 
 #include <doctest/doctest.h>
 
@@ -20,48 +17,9 @@
 
 using namespace spectra;
 using namespace spectra::gpu;
+using spectra::gpu::testing::gl;
 
 namespace {
-
-struct Gl {
-    std::unique_ptr<Window> window;
-    std::unique_ptr<Device> device;
-    std::string why;
-
-    [[nodiscard]] bool ready() const { return device != nullptr; }
-};
-
-/// One context for the whole binary. Creating a window per test case is slow
-/// enough to be noticeable, and nothing here needs a fresh one.
-Gl& gl() {
-    static Gl shared = [] {
-        Gl out;
-
-        WindowOptions options;
-        options.width = 64;
-        options.height = 64;
-        options.visible = false;
-        options.vsync = false;
-        options.title = "spectra gpu tests";
-
-        auto window = Window::create(options);
-        if (!window) {
-            out.why = window.error();
-            return out;
-        }
-
-        auto device = Device::create(Window::procAddressLoader());
-        if (!device) {
-            out.why = device.error();
-            return out;
-        }
-
-        out.window = std::move(window.value());
-        out.device = std::move(device.value());
-        return out;
-    }();
-    return shared;
-}
 
 constexpr std::string_view kVertexSource = R"(
 layout(location = 0) in vec2 aPosition;
@@ -118,10 +76,7 @@ struct Quad {
 }  // namespace
 
 TEST_CASE("the device reports the context it was given") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
 
     CHECK_FALSE(gl().device->info().renderer.empty());
     CHECK_FALSE(gl().device->info().version.empty());
@@ -129,10 +84,7 @@ TEST_CASE("the device reports the context it was given") {
 }
 
 TEST_CASE("a handle stops resolving once its resource is destroyed") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     auto texture =
@@ -150,10 +102,7 @@ TEST_CASE("a handle stops resolving once its resource is destroyed") {
 }
 
 TEST_CASE("a texture bigger than the driver allows is refused with a message") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     const int tooBig = device.info().maxTextureSize + 1;
@@ -164,10 +113,7 @@ TEST_CASE("a texture bigger than the driver allows is refused with a message") {
 }
 
 TEST_CASE("buffers report their size and refuse writes that would overrun") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     auto buffer = device.createBuffer(
@@ -184,10 +130,7 @@ TEST_CASE("buffers report their size and refuse writes that would overrun") {
 }
 
 TEST_CASE("a shader that does not compile reports the driver's log") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     const auto shader = device.createShader(
@@ -199,10 +142,7 @@ TEST_CASE("a shader that does not compile reports the driver's log") {
 }
 
 TEST_CASE("a framebuffer hands back a colour texture of the size asked for") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     auto target = device.createFramebuffer(
@@ -221,10 +161,7 @@ TEST_CASE("a framebuffer hands back a colour texture of the size asked for") {
 }
 
 TEST_CASE("clearing writes linear values, not sRGB-encoded ones") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     auto target = device.createFramebuffer(FramebufferDesc{.width = 4, .height = 4});
@@ -243,10 +180,7 @@ TEST_CASE("clearing writes linear values, not sRGB-encoded ones") {
 }
 
 TEST_CASE("the blend modes composite the way the table says they do") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     auto shader = device.createShader(
@@ -330,10 +264,7 @@ TEST_CASE("the blend modes composite the way the table says they do") {
 }
 
 TEST_CASE("a target above 8 bits per channel holds values an RGBA8 one would clip") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     auto target = device.createFramebuffer(
@@ -352,10 +283,7 @@ TEST_CASE("a target above 8 bits per channel holds values an RGBA8 one would cli
 }
 
 TEST_CASE("steady-state drawing allocates nothing on the GPU") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     auto shader = device.createShader(
@@ -398,10 +326,7 @@ TEST_CASE("steady-state drawing allocates nothing on the GPU") {
 }
 
 TEST_CASE("a chain of effects aliases down to two framebuffers") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     DeviceTargetAllocator allocator(device);
@@ -438,10 +363,7 @@ TEST_CASE("a chain of effects aliases down to two framebuffers") {
 }
 
 TEST_CASE("a pass reads the texture an input pass rendered") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     DeviceTargetAllocator allocator(device);
@@ -473,10 +395,7 @@ TEST_CASE("a pass reads the texture an input pass rendered") {
 }
 
 TEST_CASE("redundant state changes are not sent to the driver") {
-    if (!gl().ready()) {
-        MESSAGE("skipped, no GL context: " << gl().why);
-        return;
-    }
+    SPECTRA_REQUIRE_GL();
     Device& device = *gl().device;
 
     device.beginFrame();

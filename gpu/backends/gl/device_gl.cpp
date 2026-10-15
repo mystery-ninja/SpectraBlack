@@ -38,6 +38,8 @@ struct GlFormat {
     switch (format) {
         case TextureFormat::RGBA8:
             return {GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE};
+        case TextureFormat::SRGB8:
+            return {GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE};
         case TextureFormat::RGBA16F:
             return {GL_RGBA16F, GL_RGBA, GL_FLOAT};
         case TextureFormat::R8:

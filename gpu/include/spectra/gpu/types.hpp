@@ -18,7 +18,8 @@ namespace spectra::gpu {
 /// additive glows overlap. Avee composites in sRGB8 and it shows. See
 /// docs/03-RENDER-ENGINE.md.
 enum class TextureFormat : std::uint8_t {
-    RGBA8,    ///< Final output, and source images after decode.
+    RGBA8,    ///< Final output, and data that is not a colour.
+    SRGB8,    ///< Source images. The driver returns linear light when sampling.
     RGBA16F,  ///< Linear-light working format. The default for render targets.
     R8,       ///< Masks and single-channel data.
     R16F,     ///< Spectrum uploads, where 8 bits is not enough dynamic range.

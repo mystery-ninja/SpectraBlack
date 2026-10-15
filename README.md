@@ -18,12 +18,13 @@ audio, which is exactly the intersection this app occupies. **Black** is the
 suffix for *complete* — in the sense of a black belt, and of the empty canvas
 the visuals emerge from.
 
-> **Status: Stage 1 complete.** The documentation and architecture were written
-> first, so that the people joining this project build toward the same thing.
-> The headless core — properties, keyframes, audio drivers, the node tree,
-> save/load and undo — now exists and is tested. Next up are the renderer and
-> the audio engine, which can be built in parallel. See
-> [`docs/15-BUILD-ORDER.md`](docs/15-BUILD-ORDER.md).
+> **Status: Stages 1 and 2 complete.** The documentation and architecture were
+> written first, so that the people joining this project build toward the same
+> thing. The headless core — properties, keyframes, audio drivers, the node
+> tree, save/load and undo — exists and is tested, and so does the renderer:
+> an OpenGL 4.3 RHI, a frame graph with pooled render targets, and linear-light
+> compositing. Next is the audio engine, and then Stage 4 joins the three.
+> See [`docs/15-BUILD-ORDER.md`](docs/15-BUILD-ORDER.md).
 
 ## Targets
 
@@ -64,13 +65,25 @@ builds in seconds. Turn them on as the matching stage of
 
 | Option | Default | Enables |
 |---|---|---|
-| `SPECTRA_ENABLE_GPU` | `OFF` | The renderer; fetches GLFW (Stage 2) |
+| `SPECTRA_ENABLE_GPU` | `OFF` | The renderer; fetches GLFW, glad and stb (Stage 2) |
 | `SPECTRA_ENABLE_AUDIO` | `OFF` | Decode, playback, analysis; needs FFmpeg (Stage 3) |
 | `SPECTRA_ENABLE_APP` | `OFF` | The desktop editor (Stage 5) |
 | `SPECTRA_BUILD_TESTS` | `ON` | Unit tests |
 
 Other presets: `linux-asan` (ASan + UBSan), `linux-release`, `linux-ci`
-(warnings as errors), `windows-debug`, `windows-release`.
+(warnings as errors), `linux-gpu` (strict, with the renderer), `windows-debug`,
+`windows-release`.
+
+The renderer needs the X11 development packages from
+[`docs/02-TECH-STACK.md`](docs/02-TECH-STACK.md), and Python with Jinja2 for
+glad, which generates the GL loader at configure time:
+
+```bash
+sudo apt install libx11-dev libxrandr-dev libxinerama-dev \
+                 libxcursor-dev libxi-dev python3-jinja2
+cmake --preset linux-gpu && cmake --build --preset linux-gpu
+./build/linux-gpu/bin/spectra_gpu_demo
+```
 
 Before pushing, run the two checks CI runs:
 

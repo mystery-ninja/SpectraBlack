@@ -4,6 +4,7 @@ namespace spectra::gpu {
 
 std::uint32_t bytesPerPixel(TextureFormat format) {
     switch (format) {
+        case TextureFormat::SRGB8:
         case TextureFormat::RGBA8:
             return 4;
         case TextureFormat::RGBA16F:
