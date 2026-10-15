@@ -1,0 +1,82 @@
+# Build output
+build/
+build-*/
+out/
+cmake-build-*/
+install/
+_deps/
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+compile_commands.json
+
+# Compiled artifacts
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.exp
+
+# Android
+.gradle/
+local.properties
+*.apk
+*.aab
+*.keystore
+app-android/.cxx/
+app-android/build/
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.shared.json
+*.user
+*.swp
+*~
+.cache/
+.clangd/
+
+# App runtime data
+*.autosave
+*.autosave.*
+analysis-cache/
+*.analysiscache
+crash-dumps/
+logs/
+*.log
+
+# Test artifacts — golden reference images ARE committed,
+# actual/diff output from a test run is not
+tests/output/
+tests/**/actual/
+tests/**/diff/
+
+# Large media. Test assets belong in releases or Git LFS.
+*.mp3
+*.wav
+*.flac
+*.ogg
+*.m4a
+*.mp4
+*.mkv
+*.mov
+*.webm
+
+# Reference material — never commit any of this.
+# See CONTRIBUTING.md on the Avee Player source rule.
+reference/
+avee-re*/
+AeNux/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
