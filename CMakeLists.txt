@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.24)
 
+# C is enabled for the third-party code only: GLFW and the generated glad
+# loader. Nothing of ours is written in it.
 project(SpectraBlack
     VERSION     0.1.0
     DESCRIPTION "Audio-reactive motion graphics"
-    LANGUAGES   CXX
+    LANGUAGES   CXX C
 )
 
 # ---------------------------------------------------------------------------
@@ -100,12 +102,47 @@ if(SPECTRA_ENABLE_GPU)
     set(GLFW_BUILD_DOCS     OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+    # GLFW builds a Wayland backend by default on Linux, which needs
+    # wayland-scanner and the protocol XML. Rather than making every
+    # contributor install those to get a window, build what the machine can
+    # and say so. Under Wayland without them, X11 runs through XWayland.
+    if(UNIX AND NOT APPLE)
+        find_package(PkgConfig QUIET)
+        find_program(SPECTRA_WAYLAND_SCANNER wayland-scanner)
+        if(PkgConfig_FOUND AND SPECTRA_WAYLAND_SCANNER)
+            pkg_check_modules(SPECTRA_WAYLAND_PROTOCOLS QUIET wayland-protocols>=1.15)
+        endif()
+        if(SPECTRA_WAYLAND_SCANNER AND SPECTRA_WAYLAND_PROTOCOLS_FOUND)
+            set(GLFW_BUILD_WAYLAND ON  CACHE BOOL "" FORCE)
+        else()
+            message(STATUS "wayland-scanner or wayland-protocols missing — GLFW: X11 only")
+            set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
+        endif()
+        set(GLFW_BUILD_X11 ON CACHE BOOL "" FORCE)
+    endif()
+
     FetchContent_Declare(glfw
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG        3.4
         GIT_SHALLOW    TRUE
     )
     FetchContent_MakeAvailable(glfw)
+
+    # glad 2 generates the loader at configure time, which needs Python with
+    # Jinja2 (`pip install jinja2`, or `apt install python3-jinja2`). The
+    # generated code has no runtime dependency on either.
+    FetchContent_Declare(glad
+        GIT_REPOSITORY https://github.com/Dav1dde/glad.git
+        GIT_TAG        v2.0.8
+        GIT_SHALLOW    TRUE
+        SOURCE_SUBDIR  cmake
+    )
+    FetchContent_MakeAvailable(glad)
+
+    # REPRODUCIBLE pins the generated source so two machines produce identical
+    # output, which keeps the loader out of build-difference investigations.
+    glad_add_library(spectra_glad REPRODUCIBLE API gl:core=4.3)
 endif()
 
 # ---------------------------------------------------------------------------

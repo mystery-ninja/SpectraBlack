@@ -53,6 +53,16 @@
     },
 
     {
+      "name": "linux-gpu",
+      "displayName": "Linux CI + GPU module",
+      "description": "Adds the renderer. Needs the X11 dev packages, and Python with Jinja2 for the glad loader",
+      "inherits": "linux-ci",
+      "cacheVariables": {
+        "SPECTRA_ENABLE_GPU": "ON"
+      }
+    },
+
+    {
       "name": "windows-debug",
       "displayName": "Windows Debug",
       "inherits": "base",
@@ -77,6 +87,7 @@
     { "name": "linux-asan",    "configurePreset": "linux-asan" },
     { "name": "linux-release", "configurePreset": "linux-release" },
     { "name": "linux-ci",      "configurePreset": "linux-ci" },
+    { "name": "linux-gpu",     "configurePreset": "linux-gpu" },
     { "name": "windows-debug", "configurePreset": "windows-debug" },
     { "name": "windows-release","configurePreset": "windows-release" }
   ],
@@ -92,6 +103,7 @@
     { "name": "linux-asan",    "configurePreset": "linux-asan",    "inherits": "base" },
     { "name": "linux-release", "configurePreset": "linux-release", "inherits": "base" },
     { "name": "linux-ci",      "configurePreset": "linux-ci",      "inherits": "base" },
+    { "name": "linux-gpu",     "configurePreset": "linux-gpu",     "inherits": "base" },
     { "name": "windows-debug", "configurePreset": "windows-debug", "inherits": "base" }
   ]
 }

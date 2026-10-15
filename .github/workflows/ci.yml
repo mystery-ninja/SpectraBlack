@@ -57,6 +57,32 @@ jobs:
       - name: Test
         run: ctest --preset linux-ci
 
+  gpu:
+    name: Linux GPU module
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build \
+            libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev \
+            libwayland-dev wayland-protocols libxkbcommon-dev
+          # glad generates the GL loader at configure time with Jinja2.
+          pip install --user jinja2
+
+      - name: Configure
+        run: cmake --preset linux-gpu
+
+      - name: Build
+        run: cmake --build --preset linux-gpu
+
+      # No GL context on the runner, so this covers the parts that do not need
+      # one. Golden-image tests arrive with a headless EGL job.
+      - name: Test
+        run: ctest --preset linux-gpu
+
   windows:
     name: Windows (MSVC, Debug)
     runs-on: windows-latest
