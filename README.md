@@ -18,12 +18,14 @@ audio, which is exactly the intersection this app occupies. **Black** is the
 suffix for *complete* — in the sense of a black belt, and of the empty canvas
 the visuals emerge from.
 
-> **Status: Stages 1 and 2 complete.** The documentation and architecture were
-> written first, so that the people joining this project build toward the same
-> thing. The headless core — properties, keyframes, audio drivers, the node
-> tree, save/load and undo — exists and is tested, and so does the renderer:
+> **Status: Stages 1, 2 and 3 complete.** The documentation and architecture
+> were written first, so that the people joining this project build toward the
+> same thing. The headless core — properties, keyframes, audio drivers, the
+> node tree, save/load and undo — exists and is tested; so does the renderer —
 > an OpenGL 4.3 RHI, a frame graph with pooled render targets, and linear-light
-> compositing. Next is the audio engine, and then Stage 4 joins the three.
+> compositing; and so does the audio engine — decode, offline spectral
+> analysis, onset detection, a disk cache and playback, all deterministic.
+> The three are built but not yet joined: that is Stage 4.
 > See [`docs/15-BUILD-ORDER.md`](docs/15-BUILD-ORDER.md).
 
 ## Targets

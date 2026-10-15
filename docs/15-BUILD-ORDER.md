@@ -152,11 +152,22 @@ state. **Done.**
 - [x] `AnalysisFrame` cache, queryable by time with interpolation
 - [x] Cache persistence to disk, keyed by audio file content hash
 - [x] Spectral flux onset detection with a centered adaptive threshold
-- [ ] Tests: sine in the right band, click train at known BPM, silence yields
+- [x] `AnalysisSignalProvider`, so Stage 1's bindings resolve against real audio
+- [x] Tests: sine in the right band, click train at known BPM, silence yields
       zeros not NaNs, identical output across thread counts
+
+Run `spectra_audio_demo` to see it. Given no arguments it writes a synthetic
+track and analyses that, so it works on a machine with no music on it.
+
+A caveat worth carrying into Stage 4: onsets are not beats. The detector finds
+hi-hats and ghost notes as happily as kicks, which is correct for what it is
+and is not a beat grid. Tempo estimation is Phase 2 in
+[`04-AUDIO-ENGINE.md`](04-AUDIO-ENGINE.md), and until it exists `beatPhase`
+runs between consecutive onsets rather than between beats.
 
 **Exit:** load a track, play it, and query any signal at any `t` with
 bit-identical results on repeat. Determinism is the whole point of this stage.
+**Done.**
 
 ---
 

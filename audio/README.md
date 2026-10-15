@@ -163,3 +163,56 @@ behaviour worth testing — wrapping, clamping, running off the end — and the
 player needs a sound card to exist at all. CI runners have no sound card, so
 the handful of device tests report themselves skipped there while the cursor
 tests run everywhere.
+
+**`signal_provider.hpp`** — `AnalysisSignalProvider`, which is the whole
+module seen from Stage 1. Core's property bindings ask for a named signal at a
+time; this answers out of the cache. The header carries the vocabulary table,
+because a driver named `beatPhase` is useless if its range and meaning live in
+someone else's head.
+
+It is stateless with respect to time — every query is a lookup, never a step
+from the last one — which is what lets the renderer scrub, loop and render out
+of order and still agree with itself. The test suite checks that by querying
+in a scrambled order and comparing bit-for-bit against a forward pass.
+
+## The demo
+
+`spectra_audio_demo` is the Stage 3 exit criterion made runnable. With no
+arguments it synthesises a track, so it works on a machine with no music on
+it; given a path it uses that instead.
+
+```
+$ spectra_audio_demo
+spectra-demo-track.wav
+  12.0 s, 2401 frames at 200 Hz, 256 bands
+  51 onsets, 255 per minute
+  ready in 132 ms
+latency 75 ms
+ 11.91s |    ▁▁                               ▁▁▁▁▁▁     | beat 49   phase 0.69 pulse 0.43
+52000 signal queries, forwards and scrambled: bit-identical
+```
+
+The second run of the same file reports `ready in 6 ms`, which is the disk
+cache doing its job.
+
+## Onsets are not beats
+
+Worth stating plainly, because the signal is named `beat` and the demo prints
+a rate per minute. The detector finds hi-hats and ghost notes as readily as
+kicks. That is what spectral flux onset detection *is*; it is not a beat grid,
+and the numbers above are events per minute rather than a tempo.
+
+Getting from one to the other means estimating tempo — autocorrelate the flux
+envelope, fit a grid, snap onsets to it — which is Phase 2 in
+[`docs/04-AUDIO-ENGINE.md`](../docs/04-AUDIO-ENGINE.md). The envelope is
+already good enough to support it: autocorrelating it over a sample of real
+tracks recovers a plausible tempo on each.
+
+That last part only became true once the flux was computed on log-compressed
+magnitudes. Differencing raw magnitude makes the flux a report on whichever
+band happens to be loudest, so in a dense mix the detector follows the sustain
+of the bass instead of the attack of anything, and the envelope's periodicity
+drowns. Compressing first puts a quiet sharp transient and a loud gradual
+swell on comparable footing — roughly what the ear does — and
+`test_analysis.cpp` pins the consequence: a click thirty times quieter than
+the drone covering it is still the largest flux event in the track.
