@@ -38,6 +38,32 @@ The same applies to anything extracted from After Effects.
 If you are not sure which side of the line something falls on, open an issue and
 ask before writing it.
 
+### Where the reference material lives
+
+None of this is in the repository and none of it ever will be, for the licensing
+reasons above. It sits on MysterY's machine, and the paths are recorded here so
+that nobody re-derives from memory something they could have read.
+
+| Path | What it is | Useful for |
+|---|---|---|
+| `/media/mystery/MysterYFile/Avee Player/avee-re-master` | Apktool output of Avee Player 1.2.101 — the RE fork by TheCubiq. `smali/` is the authority; `java_src/` is an incomplete decompile. | [`docs/09-AVEE-TEARDOWN.md`](docs/09-AVEE-TEARDOWN.md), [`docs/17-FEATURE-PARITY.md`](docs/17-FEATURE-PARITY.md), DSP and render technique |
+| `/media/mystery/MysterYFile/Avee Player/Viz` | Real `.viz` projects, including ones MysterY shipped | [`docs/14-VIZ-COMPATIBILITY.md`](docs/14-VIZ-COMPATIBILITY.md) — import fixtures |
+| `/media/mystery/MysterYFile/After Effects/Mysterylizer/Mysterylizer.aep` | A real, non-trivial AE project (7.8 MB) | [`docs/12-AEP-COMPATIBILITY.md`](docs/12-AEP-COMPATIBILITY.md) — a RIFX tree to read against |
+| `~/AeNux/ae` | After Effects 2024 under Wine, including `aerender.exe` | Producing `.aepx` to compare against, and checking what AE actually does with a given input |
+
+The Avee subtrees worth knowing by name, since the tree is deep:
+
+```
+smali/com/daaw/avee/comp/Visualizer/Dsp/           windows, curves, 1-D filters
+smali/com/daaw/avee/comp/Visualizer/Elements/      the 26 element types
+smali/com/daaw/avee/comp/Visualizer/Elements/Segment/   spectrum/waveform DSP
+smali/com/daaw/avee/comp/PcmProcess/               PCM buffering
+```
+
+When you use any of it, cite the class in a comment — `// Avee's
+SegmentAudioSpectrumData does X` — so the next reader knows the idea has a
+precedent and can go look at it. Citing is encouraged; copying is not.
+
 ## Code standards
 
 Full detail in [`docs/02-TECH-STACK.md`](docs/02-TECH-STACK.md). The short

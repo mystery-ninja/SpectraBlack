@@ -17,6 +17,12 @@ progress board.
 > **Rule:** do not start a stage whose dependencies are unfinished. The ordering
 > exists because building on an unstable foundation means building twice.
 
+Before starting a stage, check whether the problem has already been solved by
+somebody we can read. The decompiled Avee Player source, real `.viz` projects,
+a real `.aep`, and an After Effects install are all on disk — the paths are in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md), along with the rule about reading
+versus copying. Stages 3 and 4 in particular have a lot of prior art there.
+
 ## Why the GUI is not first
 
 The intuitive order is "make the interface, then make it work." It is wrong here,

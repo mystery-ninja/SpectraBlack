@@ -239,6 +239,11 @@ Easier to test than anything else in the project, because both ends are JSON:
 - **Color round-trip.** Signed ARGB ints decode correctly, including the negative
   values Avee's defaults use.
 
+Real `.viz` projects to test against — several of them shipped — are on disk
+already; see the reference-material table in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md). Prefer those over inventing fixtures,
+since the point is to survive what Avee actually writes.
+
 ## Open decisions
 
 1. **Confirm the priority inversion.** This document argues `.viz` import belongs

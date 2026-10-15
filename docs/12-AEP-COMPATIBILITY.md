@@ -335,6 +335,11 @@ The `.aepx` path is genuinely testable, unlike a renderer:
 Keep fixtures tiny and footage-free so they do not drag in large binaries; real
 media goes through Git LFS or releases per [`10-GIT-GUIDE.md`](10-GIT-GUIDE.md).
 
+A real AE project and an AE installation capable of running `aerender` are both
+available on disk — see the reference-material table in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md). Route D is therefore testable now
+rather than hypothetically.
+
 ## Where this sits in the roadmap
 
 This is **Phase 4** work ([`08-ROADMAP.md`](08-ROADMAP.md)) and should not move

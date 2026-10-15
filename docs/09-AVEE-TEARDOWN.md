@@ -1,7 +1,11 @@
 # 09 — Avee Player Teardown
 
 Findings from reading the decompiled Avee Player 1.2.101 source at
-`/media/mystery/MysterYFile/Avee Player/avee-re-master`.
+`/media/mystery/MysterYFile/Avee Player/avee-re-master`. That tree and the other
+reference material we have on disk are catalogued in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md) — **go and read the source when a
+question comes up**, rather than treating this document as the last word. It is
+a summary, and summaries lose detail.
 
 **Why this document exists:** Avee solved a lot of real problems well, and we
 should take those solutions. It also made structural choices that are wrong for
