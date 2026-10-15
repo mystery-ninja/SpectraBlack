@@ -97,6 +97,44 @@ Show actual frame time, and when the preview cannot keep up, say so explicitly
 rather than silently dropping frames. A small "preview: 42fps (project 60fps)"
 readout prevents the user from concluding the export will stutter too.
 
+## Masking: take Avee's model, not AE's
+
+From the brainstorming:
+
+> *"I like the idea for masking in Avee Player more than in AE cuz in avee you
+> select an image or composition and on the 'Mask Image' you can simply pick a
+> shape, either from another composition or something else."*
+
+The feature being described is what After Effects calls a **track matte** — using
+one layer's alpha or luminance to mask another. The instinct that Avee's version
+is better is correct, and the reason is worth writing down because it generalizes.
+
+**AE binds the matte by layer order.** The matte must be the layer *directly
+above* its target, and selecting a track matte silently switches that layer off.
+Nothing on screen explains the relationship, moving an unrelated layer can break
+it, and it is a well-known stumbling block for new users.
+
+**Avee binds it by explicit reference.** You pick the mask source from a dropdown.
+The relationship is visible, it survives reordering, and one source can mask
+several targets.
+
+This is the same principle as the `AudioProvider` discussion in
+[`14-VIZ-COMPATIBILITY.md`](14-VIZ-COMPATIBILITY.md): **explicit references beat
+implicit ordering.** Order-dependent behavior is invisible state, and invisible
+state is where users lose hours.
+
+So masking is a property on the masked node — a reference to another node or
+composition, plus a mode (`Alpha`, `Inverted Alpha`, `Luma`, `Inverted Luma`). It
+shows in the inspector like any other property, and the frame graph
+([`03-RENDER-ENGINE.md`](03-RENDER-ENGINE.md)) already handles one node consuming
+another's output, so it needs no new rendering concept.
+
+One consequence to accept deliberately: an AE user will look for track mattes in
+the layer stack and not find them. The AE importer
+([`12-AEP-COMPATIBILITY.md`](12-AEP-COMPATIBILITY.md)) can translate AE's
+order-based mattes into our explicit references on import, which is strictly
+easier than the reverse would be.
+
 ## The inspector
 
 Generated entirely from the property registry described in

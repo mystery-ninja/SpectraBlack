@@ -158,7 +158,7 @@ escape hatch ever exists, it lives in Tier 3 under its warnings, not here.
 ### Packaging
 
 An effect pack is a manifest plus its shaders and optional script, zipped and
-versioned — reusing the same zip plumbing as `.napbundle` and the AE-archive
+versioned — reusing the same zip plumbing as `.specpack` and the AE-archive
 importer ([`06-PROJECT-FORMAT.md`](06-PROJECT-FORMAT.md),
 [`12-AEP-COMPATIBILITY.md`](12-AEP-COMPATIBILITY.md)). An unknown effect pack
 referenced by a project degrades to the placeholder-node behaviour already

@@ -68,7 +68,7 @@ That is the real test and no internal metric substitutes for it.
 | Area | Scope |
 |---|---|
 | Android | NDK build of the core, Compose UI, AAudio, GLES 3.2 backend, APK |
-| Sharing | `.napbundle` import/export, preset browser |
+| Sharing | `.specpack` import/export, preset browser |
 | Analysis | Downbeat and section detection |
 | Effects | Photoshop-family blend modes, shader-based |
 | Performance | GPU profiling pass, compute shader paths where they help |

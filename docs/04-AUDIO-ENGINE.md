@@ -154,6 +154,55 @@ whole track's statistics**, so the intro is not crushed by the chorus's loudness
 That is a genuinely better result than any realtime player can achieve, and worth
 advertising.
 
+### 7. Spectral tilt — the "Avee bass bug"
+
+From the brainstorming:
+
+> *"AE renders audio correct. Avee does render reverbed bass as extreme bass
+> which is false and a bug."*
+
+This is a real and well-known failure, and naming the cause tells us what to
+build. There are three compounding reasons Avee's bass pins to maximum, and they
+need three different fixes.
+
+**Cause 1 — music is not flat, and nobody compensates.** Musical audio has
+roughly `1/f` energy distribution ("pink"), so there is genuinely far more energy
+at 60 Hz than at 6 kHz. Display raw FFT magnitude and bass *always* dominates —
+not because the mix is bass-heavy but because that is what music looks like. This
+is the main offender.
+
+The fix is **spectral tilt compensation**: weight each band by roughly `+3 dB per
+octave` so that pink noise reads as a flat line. After that, a band only looks
+loud when it is loud *relative to what music normally does at that frequency*,
+which is what a viewer actually perceives. An optional perceptual (A-weighting or
+equal-loudness) curve on top gets closer still.
+
+**Cause 2 — long FFT windows smear reverb in time.** A 2048-sample window at
+44.1 kHz spans 46 ms. A reverb tail on a kick stays inside that window for many
+consecutive frames, so the bass band keeps reporting energy well after the
+transient is over. Low frequencies are the worst case because they need long
+windows for frequency resolution — a 40 Hz wave is 25 ms long on its own.
+
+The honest fix is **multi-resolution analysis**: long windows for low bands where
+frequency resolution matters, short windows for high bands where timing matters.
+A constant-Q transform is the textbook approach. That is Phase 2 work; Phase 1
+can ship a single window size and accept some smear.
+
+**Cause 3 — symmetric smoothing holds it up.** With one global decay coefficient,
+the bass band's sustained energy never falls. Attack and decay must be
+**per-band-group**, so bass can be set to fall faster than it rises while the
+highs stay smooth.
+
+The payoff is that our offline analysis makes the correct fix cheap: we can
+normalize **per band against that track's own distribution**, so "is this bass
+loud?" is answered relative to the rest of the song rather than against an
+absolute threshold. No realtime player can do that, and it is precisely the
+difference MysterY noticed between AE and Avee.
+
+Expose the tilt as a user control (`Flat` / `Pink` / `Perceptual`) rather than
+hardcoding it. "Technically correct" and "looks good on this track" are not
+always the same, and Avee's raw look is what its community is used to.
+
 ## Beat detection
 
 Needed for `Beat`-family drivers, and good beat detection is a real

@@ -58,6 +58,7 @@ editor. The reasoning behind each of those is in
 | [11-NAMING-AND-LICENSE.md](docs/11-NAMING-AND-LICENSE.md) | Name candidates and the license decision, with tradeoffs |
 | [12-AEP-COMPATIBILITY.md](docs/12-AEP-COMPATIBILITY.md) | Scoped import of After Effects projects, the fidelity limits, and the zipped-archive path |
 | [13-EXTENSIBILITY.md](docs/13-EXTENSIBILITY.md) | Property expressions, scriptable effect nodes, and editor extensions — with the determinism and sandbox rules |
+| [14-VIZ-COMPATIBILITY.md](docs/14-VIZ-COMPATIBILITY.md) | Import of Avee `.viz` projects — easier than the AE path and aimed at our beachhead audience |
 
 ### References (read any time)
 
@@ -69,8 +70,10 @@ editor. The reasoning behind each of those is in
 
 | | Role |
 |---|---|
-| **MysterY** ([@mystery-ninja](https://github.com/mystery-ninja)) | Project lead, architecture |
-| **Schxma** ([@tlgkxd123](https://github.com/tlgkxd123)) | Core development |
+| **MysterY** ([@mystery-ninja](https://github.com/mystery-ninja)) | Project lead |
+| **Schxma** ([@tlgkxd123](https://github.com/tlgkxd123)) | Contributor |
+| **Zion** | Contributor |
+| **Ayashii** | Contributor |
 
 We fail together and we succeed together. Everyone here has push access and the
 workflow is flat by design — see [`CONTRIBUTING.md`](CONTRIBUTING.md).

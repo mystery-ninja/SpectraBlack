@@ -241,7 +241,7 @@ directory and a report. Users zip that to share it. Handling it:
    target project's `assets/`, and record size + content hash so later moves can
    auto-relink.
 
-This reuses machinery we already have. Our own shareable `.napbundle` is "a zip of
+This reuses machinery we already have. Our own shareable `.specpack` is "a zip of
 project plus assets" ([`06-PROJECT-FORMAT.md`](06-PROJECT-FORMAT.md)), so the zip
 plumbing, the temp-workspace handling, and the asset-hash relink logic are shared
 between importing an AE archive and opening our own bundles. One implementation,

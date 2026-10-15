@@ -15,8 +15,8 @@
 
 | Form | Extension | Contents |
 |---|---|---|
-| Working project | `.napproj` | JSON, assets referenced by relative path |
-| Shareable bundle | `.napbundle` | Zip containing the JSON plus embedded assets |
+| Working project | `.spec` | JSON, assets referenced by relative path |
+| Shareable bundle | `.specpack` | Zip containing the JSON plus embedded assets |
 
 Working projects stay text so they diff cleanly. Bundles are for distribution,
 and are just a zip, so anyone can open one and look inside — which matters for a
@@ -25,11 +25,31 @@ community that will want to learn from each other's scenes.
 Analysis caches are **never** stored in either. They are derived data, keyed by
 audio file hash, and live in a cache directory.
 
+### The full extension family
+
+| Extension | What it is | Spec |
+|---|---|---|
+| `.spec` | Project / visualizer file | this document |
+| `.specpack` | Project plus embedded assets, zipped | this document |
+| `.sbx` | Importable plugin or effect pack | [`13-EXTENSIBILITY.md`](13-EXTENSIBILITY.md) |
+
+Equivalents elsewhere: `.spec` is our `.aep` (After Effects) and `.viz` (Avee).
+Import from both is planned — see
+[`12-AEP-COMPATIBILITY.md`](12-AEP-COMPATIBILITY.md) and
+[`14-VIZ-COMPATIBILITY.md`](14-VIZ-COMPATIBILITY.md).
+
+> **Flag on `.spec`:** the extension is already widely used — RPM package
+> specs, PyInstaller build specs, and RSpec test files all claim it. For a
+> desktop app with its own file association the practical collision is mild, but
+> it does mean a web search for "spec file" will never find us, and a developer's
+> editor may syntax-highlight our projects as something else. `.sbp` (Spectra
+> Black Project) or `.sblack` would be unambiguous. Listed in Open Decisions.
+
 ## Structure
 
 ```jsonc
 {
-  "format": "newapp-project",
+  "format": "spectra-black-project",
   "formatVersion": 1,
   "appVersion": "0.1.0",
 
