@@ -58,15 +58,39 @@ Conventional, because this is solved and users have correct expectations.
 ```cpp
 template <typename T>
 struct Keyframe {
-    double       time;
-    T            value;
-    Interpolation in;      // how we arrive
-    Interpolation out;     // how we leave
-    Vec2 handleIn, handleOut;  // bezier control points
+    Seconds       time;
+    T             value;
+    Interpolation in;         // how we arrive
+    Interpolation out;        // how we leave
+    BezierHandle  handleIn;   // used when in  == Bezier
+    BezierHandle  handleOut;  // used when out == Bezier
 };
 
-enum class Interpolation { Hold, Linear, Bezier, Ease, EaseIn, EaseOut };
+enum class Interpolation : std::uint8_t { Hold, Linear, Bezier, Ease };
 ```
+
+> **Implemented in `core/include/spectra/core/keyframe.hpp`.** Two details were
+> settled while building it:
+>
+> **There is no `EaseIn`/`EaseOut`.** The original sketch listed both alongside
+> `Ease`, but the side the mode is set on already carries the direction —
+> `Ease` on a keyframe's `out` is an ease out of it, and on its `in` an ease
+> into it. Keeping all three would have meant three enum values with two
+> meanings and a silent rule about which wins.
+>
+> **Handles are stored in normalized segment space, as an offset from their own
+> keyframe pointing into the segment.** So `x` is a fraction of the segment's
+> duration and `y` a fraction of its value change, and the two sides are mirror
+> images. This makes the defaults symmetric, makes a handle of `(1/3, 1/3)` on
+> both sides *exactly* linear, and — the real reason — makes a handle survive
+> its keyframes being dragged to new times or values, which a handle stored in
+> absolute units would not.
+>
+> Handle `x` is clamped to `[0, 1]` when the curve is solved. That is what keeps
+> the curve a function of time; an unclamped handle can fold it back on itself
+> and give one time two values. Handle `y` is deliberately left unclamped,
+> because overshoot past the keyframe value is exactly how anticipation and
+> bounce are built.
 
 Notes on the details that matter:
 
@@ -138,6 +162,36 @@ raw signal  →  [remap]  →  [curve]  →  [attack/decay]  →  [delay]  →  
 Every stage must be deterministic. The random stage is seeded from
 `(driverId, beatIndex)` rather than a running RNG, so scrubbing backward gives
 the same values. This is a small detail with a large correctness payoff.
+
+### How attack/decay stays deterministic
+
+An envelope follower is a feedback loop: its output at time `t` depends on its
+own previous output. The obvious implementation keeps that state in the driver
+and advances it once per frame — and that is precisely the Avee bug described in
+[`04-AUDIO-ENGINE.md`](04-AUDIO-ENGINE.md). State carried across frames makes
+the result depend on the frame rate and on *how you arrived at a time* rather
+than on the time itself, so a preview at 50 fps and an export at 60 fps produce
+different pixels for the same frame.
+
+The implementation in `core/src/shaping.cpp` keeps no state at all. On every
+evaluation it rebuilds the envelope by walking a bounded window of the signal's
+history at a fixed hop:
+
+- The hop is `1/200 s`, matching the analysis hop, so that once Stage 3 lands
+  the walk falls on real analysis frames rather than interpolating between them.
+- The window is five time constants, after which the error from the unknown
+  starting value is under 1%, capped at two seconds so one slow envelope cannot
+  make a single property evaluation walk unboundedly far back.
+
+The cost is roughly 100–400 signal samples per driver per evaluation, which is
+real but affordable, and the `EvalPlan` can amortise it later since playback
+evaluates time monotonically. What it buys is that `apply(t)` is a pure function
+of `t`: the same time gives the same answer at any frame rate, scrubbing in
+either direction, on any thread. That property is tested directly.
+
+The delay stage is applied by shifting the sample time rather than by delaying
+the output. Both stages are time-invariant, so the two are equivalent, and
+shifting first means the envelope's history walk is already aligned.
 
 ## The UI for this
 

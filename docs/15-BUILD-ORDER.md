@@ -43,21 +43,22 @@ the "it's alive" moment and it is deliberately early.
 **Unblocks everyone. Nothing else starts until this is done.** One person, a few
 days.
 
-- [ ] `CMakeLists.txt` with module directories: `core`, `gpu`, `audio`,
+- [x] `CMakeLists.txt` with module directories: `core`, `gpu`, `audio`,
       `render`, `export`, `platform`, `app-desktop`
-- [ ] CMake presets for `linux-debug`, `linux-release`, `windows-debug`
-- [ ] `FetchContent` wiring for GLFW, GLM, doctest (more added as needed)
-- [ ] A hello-world binary that builds and runs
-- [ ] `doctest` wired in, one trivial test passing via `ctest`
-- [ ] `.clang-format` committed
-- [ ] GitHub Actions: Linux build + test, clang-format check
-- [ ] CI job that **fails if anything in `core/` includes GL, OS, or UI headers**
+- [x] CMake presets for `linux-debug`, `linux-release`, `windows-debug`
+      (plus `linux-asan` and `linux-ci`)
+- [x] `FetchContent` wiring for GLFW, GLM, doctest (more added as needed)
+- [x] A hello-world binary that builds and runs
+- [x] `doctest` wired in, one trivial test passing via `ctest`
+- [x] `.clang-format` committed
+- [x] GitHub Actions: Linux build + test, clang-format check
+- [x] CI job that **fails if anything in `core/` includes GL, OS, or UI headers**
 
 Install first: `sudo apt install cmake ninja-build clang-format clang-tidy`
 plus the X11 and FFmpeg dev packages from [`02-TECH-STACK.md`](02-TECH-STACK.md).
 
 **Exit:** a new contributor can clone, build, and run the tests in under five
-minutes with no manual setup.
+minutes with no manual setup. **Done.**
 
 That last CI job is the one that protects the architecture long-term. Everything
 else in Stage 0 is conventional.
@@ -69,20 +70,25 @@ else in Stage 0 is conventional.
 **Pure C++ logic, no GPU, no UI, fully unit-testable.** This is the heart of the
 app and the most important code in the project.
 
-- [ ] `Property<T>` — static value, keyframe track, driver list
-- [ ] `Keyframe<T>` and `KeyframeTrack<T>` with `Hold`, `Linear`, `Bezier`
-- [ ] Keyframe evaluation at arbitrary `t`, with bezier handles
+- [x] `Property<T>` — static value, keyframe track, driver list
+- [x] `Keyframe<T>` and `KeyframeTrack<T>` with `Hold`, `Linear`, `Bezier`
+- [x] Keyframe evaluation at arbitrary `t`, with bezier handles
 - [ ] `Node` base + `Group`/`Composition` containers; the tree
 - [ ] `PropertyRegistry` and `describe()` — the declarative property system
-- [ ] `Driver` struct: signal reference, shaping chain, amount, blend op
-- [ ] Blend operators: `Add`, `Multiply`, `Replace`, `Max`, `Min`
-- [ ] Shaping chain: remap, curve, attack/decay, delay, seeded random
+- [x] `Driver` struct: signal reference, shaping chain, amount, blend op
+- [x] Blend operators: `Add`, `Multiply`, `Replace`, `Max`, `Min`
+- [x] Shaping chain: remap, curve, attack/decay, delay, seeded random
 - [ ] Evaluator: flatten the tree into `EvalPlan`, evaluate to a flat output array
 - [ ] JSON serialization, round-trip lossless
 - [ ] Unknown-key and unknown-node-type preservation
       ([`06-PROJECT-FORMAT.md`](06-PROJECT-FORMAT.md))
 - [ ] `Command` stack: apply, revert, `mergeWith` coalescing
-- [ ] Tests for all of the above
+- [x] Tests for everything landed so far (54 cases)
+
+The checked items above are the **property evaluation path**: you can build a
+property in code, give it keyframes and audio drivers, and evaluate it at any
+time. What remains is the **scene** around it — the node tree, the declarative
+registry, the flattened evaluator, save/load, and undo.
 
 Audio signals are **stubbed** here — a driver asks for `bass` and gets a fake
 sine wave. That is enough to prove the whole evaluation path, and it keeps Stage 1

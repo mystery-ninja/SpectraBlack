@@ -4,6 +4,10 @@
 # scripts/check-core-deps.sh enforces that in CI. See docs/01-ARCHITECTURE.md.
 
 add_library(spectra_core
+    src/blend.cpp
+    src/interpolation.cpp
+    src/shaping.cpp
+    src/signal.cpp
     src/version.cpp
 )
 add_library(spectra::core ALIAS spectra_core)
