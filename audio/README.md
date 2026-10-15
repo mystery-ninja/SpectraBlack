@@ -146,3 +146,20 @@ The file is written beside its target and renamed into place, because the
 hashes in the name cannot catch a torn write — the name would be right and
 only the contents wrong. A cache that cannot be written is not an error; a
 project opened from read-only media should cost speed, not function.
+
+**`playback.hpp`** — `Player` over miniaudio, plus the two pieces worth
+testing on their own: `visualTime`, which is the latency correction, and
+`PlaybackCursor`, which is the playhead.
+
+There is no ring buffer, which departs from the sketch in
+[`docs/04-AUDIO-ENGINE.md`](../docs/04-AUDIO-ENGINE.md). That design assumes
+streaming, and we decode whole tracks up front for the analysis anyway — so
+the buffer is already there, immutable, and the callback reads straight out of
+it behind one atomic cursor. A ring buffer would add a producer thread, a fill
+policy and an underrun case to solve a problem we do not have.
+
+The cursor is a separate class from the player because it holds all the
+behaviour worth testing — wrapping, clamping, running off the end — and the
+player needs a sound card to exist at all. CI runners have no sound card, so
+the handful of device tests report themselves skipped there while the cursor
+tests run everywhere.

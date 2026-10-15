@@ -138,8 +138,8 @@ state. **Done.**
 **Independent of Stages 1 and 2.** Can run in parallel.
 
 - [x] FFmpeg decode of MP3/FLAC/WAV/OGG to interleaved float PCM
-- [ ] miniaudio playback, ring buffer fed by the decoder
-- [ ] Playback clock, with device latency offset and a user offset
+- [x] miniaudio playback, reading the decoded buffer directly — see `audio/README.md`
+- [x] Playback clock, with device latency offset and a user offset
 - [x] PFFFT integration, 2048-point real FFT
 - [x] Hann window on input
 - [x] Offline analysis pass at a fixed 200 Hz hop, chunked across worker threads

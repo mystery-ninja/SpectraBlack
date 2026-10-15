@@ -206,6 +206,37 @@ if(SPECTRA_ENABLE_AUDIO)
         GIT_SUBMODULES ""  # the benchmark comparisons against other FFTs
     )
     FetchContent_MakeAvailable(pffft)
+
+    # miniaudio — one header plus one implementation file, covering ALSA,
+    # PulseAudio, PipeWire, WASAPI and AAudio. Its own CMakeLists builds tests
+    # and examples we do not want, so the implementation is compiled here
+    # instead, as C and without our warning flags.
+    #
+    # SOURCE_SUBDIR names a directory that does not exist, which is the
+    # documented way to fetch a project without adding its CMakeLists.
+    # FetchContent_Populate() would do the same and is deprecated from CMake
+    # 3.30.
+    FetchContent_Declare(miniaudio
+        GIT_REPOSITORY https://github.com/mackron/miniaudio.git
+        GIT_TAG        0.11.25
+        GIT_SHALLOW    TRUE
+        SOURCE_SUBDIR  do-not-add-subdirectory
+    )
+    FetchContent_MakeAvailable(miniaudio)
+
+    add_library(spectra_miniaudio STATIC ${miniaudio_SOURCE_DIR}/miniaudio.c)
+    add_library(spectra::miniaudio ALIAS spectra_miniaudio)
+    target_include_directories(spectra_miniaudio SYSTEM PUBLIC ${miniaudio_SOURCE_DIR})
+    set_target_properties(spectra_miniaudio PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+    # The backends are loaded at runtime, so the only hard dependencies are
+    # the dynamic loader, threads and libm. A machine with no sound server
+    # then fails to open a device rather than failing to start.
+    find_package(Threads REQUIRED)
+    target_link_libraries(spectra_miniaudio PUBLIC Threads::Threads ${CMAKE_DL_LIBS})
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(spectra_miniaudio PUBLIC m)
+    endif()
 endif()
 
 # ---------------------------------------------------------------------------
