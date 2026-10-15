@@ -5,6 +5,11 @@
 
 #include <doctest/doctest.h>
 
+// MSVC's <string_view> only forward-declares basic_ostream, so stringifying a
+// string_view for a failure message does not compile without this. libstdc++
+// pulls it in transitively, which is why GCC does not need it.
+#include <ostream>
+
 TEST_CASE("version constants are populated from the build system") {
     CHECK(spectra::kVersion.major == 0);
     CHECK(spectra::kVersion.minor == 1);
