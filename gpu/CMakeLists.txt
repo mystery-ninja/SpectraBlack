@@ -6,7 +6,9 @@
 # implementing the same device.hpp, selected at configure time.
 add_library(spectra_gpu
     backends/gl/device_gl.cpp
+    src/framegraph.cpp
     src/shader_source.cpp
+    src/target_pool.cpp
     src/types.cpp
     src/window.cpp
 )

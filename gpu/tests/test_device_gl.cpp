@@ -5,7 +5,9 @@
 // full set, which is where the coverage that matters actually comes from.
 
 #include <spectra/gpu/device.hpp>
+#include <spectra/gpu/framegraph.hpp>
 #include <spectra/gpu/shader_source.hpp>
+#include <spectra/gpu/target_pool.hpp>
 #include <spectra/gpu/window.hpp>
 
 #include <doctest/doctest.h>
@@ -393,6 +395,81 @@ TEST_CASE("steady-state drawing allocates nothing on the GPU") {
     device.destroyFramebuffer(target.value());
     device.destroyBuffer(quad.vertices);
     device.destroyShader(shader.value());
+}
+
+TEST_CASE("a chain of effects aliases down to two framebuffers") {
+    if (!gl().ready()) {
+        MESSAGE("skipped, no GL context: " << gl().why);
+        return;
+    }
+    Device& device = *gl().device;
+
+    DeviceTargetAllocator allocator(device);
+    RenderTargetPool pool(allocator);
+
+    const auto buildChain = [](FrameGraph& graph) {
+        PassId previous = graph.addPass(PassDesc{.name = "source", .width = 32, .height = 32});
+        for (int effect = 0; effect < 5; ++effect) {
+            PassDesc pass{.name = "effect", .width = 32, .height = 32};
+            pass.inputs = {previous};
+            previous = graph.addPass(std::move(pass));
+        }
+
+        PassDesc screen{.name = "screen", .width = 32, .height = 32};
+        screen.inputs = {previous};
+        screen.present = true;
+        graph.addPass(std::move(screen));
+    };
+
+    for (int frame = 0; frame < 3; ++frame) {
+        FrameGraph graph;
+        buildChain(graph);
+        REQUIRE(graph.compile());
+        graph.execute(device, pool);
+        pool.endFrame();
+    }
+
+    // Six passes, but each target is free the moment its single reader is
+    // done, so two framebuffers serve the whole chain — and the second and
+    // third frames allocate nothing at all.
+    CHECK(pool.allocations() == 2);
+    CHECK(pool.inUse() == 0);
+    CHECK(device.takeErrors().empty());
+}
+
+TEST_CASE("a pass reads the texture an input pass rendered") {
+    if (!gl().ready()) {
+        MESSAGE("skipped, no GL context: " << gl().why);
+        return;
+    }
+    Device& device = *gl().device;
+
+    DeviceTargetAllocator allocator(device);
+    RenderTargetPool pool(allocator);
+
+    FrameGraph graph;
+    TextureHandle seen;
+    TextureHandle undeclared;
+
+    const PassId source = graph.addPass(PassDesc{.name = "source", .width = 16, .height = 16});
+    const PassId other = graph.addPass(PassDesc{.name = "other", .width = 16, .height = 16});
+
+    PassDesc reader{.name = "reader", .width = 16, .height = 16};
+    reader.inputs = {source};
+    reader.execute = [&](const PassContext& context) {
+        seen = context.input(source);
+        // Reading a pass that was not declared as an input gives nothing,
+        // rather than a target the pool may already have recycled.
+        undeclared = context.input(other);
+    };
+    graph.addPass(std::move(reader));
+
+    REQUIRE(graph.compile());
+    graph.execute(device, pool);
+
+    CHECK(seen.valid());
+    CHECK_FALSE(undeclared.valid());
+    CHECK(device.textureWidth(seen) == 16);
 }
 
 TEST_CASE("redundant state changes are not sent to the driver") {
