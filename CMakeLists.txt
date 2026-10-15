@@ -51,6 +51,11 @@ if(MSVC)
 else()
     target_compile_options(spectra_compile_options INTERFACE
         -Wall -Wextra -Wpedantic
+        # -Wextra flags every field left out of a designated initializer, even
+        # one with a default member initializer. Designated initializers are a
+        # documented part of our C++20 style (docs/02-TECH-STACK.md), and
+        # leaving a defaulted field out is the point of them.
+        -Wno-missing-field-initializers
         -Wshadow
         -Wnon-virtual-dtor
         -Wcast-align
@@ -142,7 +147,14 @@ if(SPECTRA_ENABLE_GPU)
 
     # REPRODUCIBLE pins the generated source so two machines produce identical
     # output, which keeps the loader out of build-difference investigations.
-    glad_add_library(spectra_glad REPRODUCIBLE API gl:core=4.3)
+    #
+    # ARB_buffer_storage is the persistent mapping path. It is core in GL 4.4
+    # and an extension on 4.3, so it is requested rather than assumed, and the
+    # device falls back to orphan-and-upload when the driver lacks it.
+    glad_add_library(spectra_glad REPRODUCIBLE
+        API        gl:core=4.3
+        EXTENSIONS GL_ARB_buffer_storage
+    )
 endif()
 
 # ---------------------------------------------------------------------------
