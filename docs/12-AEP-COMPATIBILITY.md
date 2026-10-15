@@ -174,14 +174,50 @@ The user saves their project as XML from AE; we parse the subset.
 - **Bad:** the schema is undocumented and drifts across AE versions; requires the
   user to do a Save-As step.
 
-### Route B — Parse binary `.aep` (RIFX) directly *(deferred, maybe never)*
+### Route B — Parse binary `.aep` (RIFX) directly *(revised: viable, now recommended)*
 
-- **Good:** users drop their native file with no extra step.
-- **Bad:** undocumented binary, large and brittle RE effort, version fragility —
-  precisely the "reverse engineering nightmare" the non-goals warn against.
-  Community parsers exist but are partial. Given that anyone with a `.aep` has AE
-  and can therefore use Route A or D, this route serves a rare case at the highest
-  cost. Park it behind demand.
+**This assessment was wrong when first written and is revised here.** The original
+reasoning — undocumented binary, brittle reverse engineering, park it behind
+demand — assumed we would be doing the reverse engineering ourselves. We would
+not. The community already did it, and the work is maintained, permissively
+licensed, and current.
+
+| Project | Language | License | State |
+|---|---|---|---|
+| [`forticheprod/py-aep`](https://github.com/forticheprod/py-aep) | Python | MIT | **Actively maintained**, handles AE 2026 project stamps |
+| [`boltframe/aftereffects-aep-parser`](https://github.com/boltframe/aftereffects-aep-parser) | Go | MIT | Dormant since 2022, but documents the RIFX chunk types |
+
+`py-aep` reads and writes binary `.aep` **with no After Effects installed**,
+exposing compositions, layers, properties, keyframes, text, shapes, and gradients
+through an ExtendScript-shaped API. It explicitly does not evaluate expressions
+and does not render — which is exactly the boundary we also draw.
+
+What this changes:
+
+- **The format is not a mystery.** Two independent MIT implementations document
+  the RIFX chunk layout, so our importer is a porting job against a known
+  structure rather than a reverse-engineering spike.
+- **MIT is GPL-compatible**, so we can read, port, and adapt the format knowledge
+  and the parsing logic directly. We are not reverse engineering Adobe's binary;
+  we are reimplementing a documented open-source parser.
+- **No AE required**, which removes the Save-As step that Route A imposes and
+  serves users whose only artifact is the `.aep` itself.
+
+- **Good:** users drop their native file, no extra step, no AE needed; prior art
+  is permissive and current.
+- **Bad:** still version-fragile — the chunk layout shifts across AE releases, and
+  that maintenance cost is recurring. Expressions still cannot be evaluated, so
+  Route D remains the only path for those.
+
+### Why the recommendation changed
+
+The earlier logic was *"anyone with a `.aep` has After Effects, so Route A is
+enough."* That holds for a user importing their own work. It does not hold for the
+case that actually matters to the AE community: **receiving a project file from
+someone else.** Collaborators, template marketplaces, and tutorial project files
+all circulate as `.aep`, and the recipient frequently cannot or will not open AE
+to re-save it as XML. Requiring a Save-As step makes the feature useless at
+exactly the moment it is most valuable.
 
 ### Route C — Lottie / Bodymovin JSON *(separate, orthogonal win)*
 
@@ -206,17 +242,25 @@ project via Adobe's public scripting DOM and writes our project format directly,
 - **Bad:** requires AE installed and the user to run a script; we maintain that
   script as a small separate artifact.
 
-### Recommendation
+### Recommendation (revised)
 
-**Route A as the primary importer, Route D as the high-fidelity companion, Route C
-as an independent bonus ingest, Route B deferred indefinitely.**
+**Route B as the primary importer, Route D as the high-fidelity companion, Route A
+as a fallback, Route C as an independent bonus ingest.**
 
-A and D reinforce each other: A gives "open an AE project" with no setup, D gives
-maximum fidelity and the expression-baking that A structurally cannot. And because
-AE supports launching a script headlessly (`AfterFX.exe -r script.jsx`), the
-polished experience is achievable later: the user drops a `.aep`, we detect AE,
-invoke our exporter script against it, and import the clean result — the ease of
-Route B's UX with none of its reverse engineering.
+Route B is now primary because it is the only one that works on a `.aep` a user
+*received* rather than authored, which is the common case in the AE world. Route D
+stays essential because it is the only route that can bake expressions, using AE's
+own evaluated values through a public, sanctioned API.
+
+The two combine into the experience we actually want: drop in a `.aep` and it
+opens immediately via our own parser; if After Effects is detected on the machine
+and the project uses expressions, offer to run the exporter script
+(`AfterFX.exe -r script.jsx`) for a higher-fidelity pass. Good result with no
+setup, great result when AE is present.
+
+Route A survives as a fallback for AE versions whose binary layout our parser does
+not yet handle — `.aepx` being text makes it the safety valve when a chunk
+structure changes.
 
 ## The `.zip` archive path
 
