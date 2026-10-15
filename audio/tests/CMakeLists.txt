@@ -8,6 +8,7 @@ add_executable(spectra_audio_tests
     test_main.cpp
     test_onsets.cpp
     test_playback.cpp
+    test_signal_provider.cpp
 )
 
 target_link_libraries(spectra_audio_tests
