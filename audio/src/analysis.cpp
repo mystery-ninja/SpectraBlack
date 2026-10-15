@@ -49,6 +49,11 @@ float percentile(std::vector<float>& values, double fraction) {
     return *nth;
 }
 
+/// How hard the magnitudes are squashed before they are differenced for the
+/// flux. Larger lifts quiet bands further; the useful range is wide and this
+/// sits in the middle of it.
+constexpr float kFluxCompression = 50.0f;
+
 /// Which envelope applies to a band, by where its centre falls.
 const EnvelopeTimes& envelopeFor(const AnalysisParams& params, float centreHz) {
     if (centreHz < kBassMaxHz) {
@@ -509,8 +514,16 @@ Result<AnalysisCache> analyze(const AudioBuffer& audio, const AnalysisParams& pa
 
             // Flux is measured before the envelope, because smoothing is
             // exactly what removes the edges an onset detector looks for.
-            flux += std::max(0.0f, normalized - previous[index]);
-            previous[index] = normalized;
+            //
+            // And it is measured on log-compressed magnitudes. Differencing
+            // raw magnitude makes the flux a report on whatever band happens
+            // to be loudest, so in a dense mix the detector tracks the sustain
+            // of the bass rather than the attack of anything. Compression puts
+            // a quiet, sharp transient and a loud, gradual swell on comparable
+            // footing, which is what the ear does too.
+            const float compressed = std::log1p(kFluxCompression * normalized);
+            flux += std::max(0.0f, compressed - previous[index]);
+            previous[index] = compressed;
 
             state[index] = followEnvelope(state[index], normalized, coefficients[index]);
             const float value = state[index];

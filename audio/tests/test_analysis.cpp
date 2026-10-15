@@ -437,6 +437,29 @@ TEST_CASE("flux spikes when something starts and is quiet when nothing changes")
     CHECK(atOnset > 10.0f * duringTone);
 }
 
+TEST_CASE("a quiet transient under a loud drone still registers as flux") {
+    // Flux is measured on log-compressed magnitudes. Differencing raw
+    // magnitude makes it a report on whatever band is loudest, so in a dense
+    // mix the detector tracks the sustain of the bass rather than the attack
+    // of anything — which is what a hi-hat under a sub bass sounds like to a
+    // naive onset detector: nothing at all.
+    AudioBuffer audio = mix({{100.0, 0.9f}}, 2.0);
+    const auto clickAt = static_cast<std::size_t>(1.0 * kRate);
+    for (std::size_t index = 0; index < static_cast<std::size_t>(0.004 * kRate); ++index) {
+        const double phase = 2.0 * std::numbers::pi * 6000.0 * static_cast<double>(index) / kRate;
+        audio.samples[clickAt + index] += 0.03f * static_cast<float>(std::sin(phase));
+    }
+
+    const Result<AnalysisCache> cache = analyze(audio, fastParams());
+    REQUIRE_MESSAGE(cache, cache.error());
+
+    // Thirty times quieter than the drone it is buried under, and still the
+    // largest change in the track.
+    const float atClick = cache.value().at(1.0).flux;
+    const float elsewhere = cache.value().at(0.5).flux;
+    CHECK(atClick > 5.0f * elsewhere);
+}
+
 TEST_CASE("the first frame does not invent an onset") {
     // Measuring frame zero against an all-zero predecessor would put a beat
     // on the downbeat of every track, including ones that start in silence.
