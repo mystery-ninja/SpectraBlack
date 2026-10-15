@@ -57,6 +57,12 @@ editor. The reasoning behind each of those is in
 | [10-GIT-GUIDE.md](docs/10-GIT-GUIDE.md) | Git from scratch, plus our branching and review workflow |
 | [11-NAMING-AND-LICENSE.md](docs/11-NAMING-AND-LICENSE.md) | Name candidates and the license decision, with tradeoffs |
 
+### References (read any time)
+
+| Doc | What it covers |
+|---|---|
+| [GIT-CHEATSHEET.md](docs/GIT-CHEATSHEET.md) | **New to git? Start here.** Setup, the commands that matter, and what to watch out for |
+
 ## Team
 
 | | Role |

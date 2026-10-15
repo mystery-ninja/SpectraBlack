@@ -12,8 +12,10 @@ Read, in order:
 2. [`docs/01-ARCHITECTURE.md`](docs/01-ARCHITECTURE.md) — the module layering
 3. [`docs/02-TECH-STACK.md`](docs/02-TECH-STACK.md) — how to build it
 
-If you are new to git or want our specific workflow, see
-[`docs/10-GIT-GUIDE.md`](docs/10-GIT-GUIDE.md).
+New to git? Start with [`docs/GIT-CHEATSHEET.md`](docs/GIT-CHEATSHEET.md) — setup,
+the commands that matter, and the handful of things that can actually bite you.
+[`docs/10-GIT-GUIDE.md`](docs/10-GIT-GUIDE.md) is the longer version that explains
+how git thinks.
 
 ## The rule about Avee Player source
 

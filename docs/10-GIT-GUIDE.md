@@ -1,8 +1,12 @@
 # 10 — Git Guide
 
-Written for you specifically, since you mentioned being rusty. The first part is
-a refresher on the mental model, the second is our actual workflow, and the third
-is how to get out of trouble.
+Written for people who are rusty or new. The first part is a refresher on the
+mental model, the second is our actual workflow, and the third is how to get out
+of trouble.
+
+> **Just need the command?** See [`GIT-CHEATSHEET.md`](GIT-CHEATSHEET.md), which
+> is a scannable reference card. This document explains *why* git behaves the way
+> it does; the cheat sheet assumes you already know and just want the syntax.
 
 ## The mental model
 
