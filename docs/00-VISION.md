@@ -10,7 +10,7 @@ Put the two reference apps side by side and the hole in the market is obvious.
 | Timeline with keyframes | **No**                       | Yes, excellent                          |
 | Nested compositions     | Yes (`Composition` elements) | Yes, excellent                          |
 | Preview speed           | Instant, 60fps, GPU          | Slow, constant RAM previews and caching |
-| Effects                 | ~14 element types            | Hundreds                                |
+| Effects                 | 26 element types             | 369 bundled plugins                     |
 | Precise timing control  | **No**                       | Yes                                     |
 | Text engine             | Basic sprite fonts           | Full typographic control                |
 | Platform                | Android only                 | Windows/macOS only                      |
@@ -33,6 +33,29 @@ without having to rely on the normal way of doing things.
 **Spectra Black's core claim: a property should accept both a keyframe curve and an
 audio driver at the same time, and blend them.** That is the feature neither
 parent has, and everything else in this project exists to support it.
+
+## Nothing goes missing by accident
+
+We are combining two apps, so the default answer for any capability either
+parent has is **we keep it**. A feature may be left out only as a decision that
+somebody wrote down, with a reason. It may never be left out because it was
+overlooked, because nobody got round to it, or because it looked hard.
+
+That distinction is the whole point. An Avee user arriving here must not find
+that the one effect they built their style around silently vanished, and an AE
+user must not discover halfway through a project that a basic part of the
+workflow was never considered.
+
+The rule is enforced by a ledger rather than by good intentions:
+[`17-FEATURE-PARITY.md`](17-FEATURE-PARITY.md) lists every capability from both
+parents and its current status. Dropping something means changing its status to
+`Dropped` and writing why — the row stays, so the question "why doesn't Spectra
+Black have X?" always has an answer.
+
+This is not the same as promising feature-for-feature parity with After Effects.
+AE ships 369 plugins, many of them film-finishing tools with no bearing on music
+visuals, and the ledger marks those out of scope explicitly. The promise is that
+the decision was *made*, not that everything was built.
 
 ## The identity question
 

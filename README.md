@@ -97,6 +97,7 @@ clang-format -i $(git ls-files '*.cpp' '*.hpp')     # formatting
 | [14-VIZ-COMPATIBILITY.md](docs/14-VIZ-COMPATIBILITY.md) | Import of Avee `.viz` projects — easier than the AE path and aimed at our beachhead audience |
 | [15-BUILD-ORDER.md](docs/15-BUILD-ORDER.md) | **Picking up a task? Start here.** What to build in what order, and who can work in parallel |
 | [16-PLUGIN-HOSTING.md](docs/16-PLUGIN-HOSTING.md) | Can we run AE's `.aex` plugins? The platform blocker, and OpenFX as the open alternative |
+| [17-FEATURE-PARITY.md](docs/17-FEATURE-PARITY.md) | **Every capability from both parent apps and its status.** Nothing gets dropped without a written reason |
 
 ### References (read any time)
 
