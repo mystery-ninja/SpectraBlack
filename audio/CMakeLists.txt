@@ -1,9 +1,26 @@
 # audio — decode, playback, offline analysis. Stage 3 of docs/15-BUILD-ORDER.md.
-# Enable with -DSPECTRA_ENABLE_AUDIO=ON once there is something here.
+# Enable with -DSPECTRA_ENABLE_AUDIO=ON.
+#
+# The FFmpeg backend is the only place in the project that may include libav*.
+# A MediaCodec backend for Android becomes a sibling directory implementing the
+# same decoder.hpp.
 
-add_library(spectra_audio INTERFACE)
+add_library(spectra_audio
+    backends/ffmpeg/decoder_ffmpeg.cpp
+    src/buffer.cpp
+)
+
 add_library(spectra::audio ALIAS spectra_audio)
 
 target_include_directories(spectra_audio
-    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
+
+target_link_libraries(spectra_audio
+    PUBLIC  spectra::core
+    PRIVATE spectra::ffmpeg spectra::compile_options
+)
+
+if(SPECTRA_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

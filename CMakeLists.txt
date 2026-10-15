@@ -166,6 +166,33 @@ if(SPECTRA_ENABLE_GPU)
     )
 endif()
 
+if(SPECTRA_ENABLE_AUDIO)
+    # FFmpeg is found rather than fetched. It is the one dependency we do not
+    # build ourselves (docs/02-TECH-STACK.md): it is enormous, it is packaged
+    # everywhere, and a from-source build would dwarf the rest of the project's
+    # configure time.
+    #
+    #   Debian/Ubuntu: sudo apt install libavformat-dev libavcodec-dev \
+    #                                   libavutil-dev libswresample-dev
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
+        libavformat>=59
+        libavcodec>=59
+        libavutil>=57
+        libswresample>=4
+    )
+
+    # Aliased so that the audio module names a target of ours rather than
+    # PkgConfig's, which is what makes a second backend a drop-in.
+    add_library(spectra_ffmpeg INTERFACE)
+    add_library(spectra::ffmpeg ALIAS spectra_ffmpeg)
+    target_link_libraries(spectra_ffmpeg INTERFACE PkgConfig::FFMPEG)
+
+    # SYSTEM: libav* headers do not survive -Wall -Wextra -Werror, and that is
+    # not their job.
+    target_include_directories(spectra_ffmpeg SYSTEM INTERFACE ${FFMPEG_INCLUDE_DIRS})
+endif()
+
 # ---------------------------------------------------------------------------
 # Modules
 #

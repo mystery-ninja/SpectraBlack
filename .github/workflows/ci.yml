@@ -83,6 +83,28 @@ jobs:
       - name: Test
         run: ctest --preset linux-gpu
 
+  audio:
+    name: Linux audio module
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build \
+            libavformat-dev libavcodec-dev libavutil-dev libswresample-dev \
+            ffmpeg
+
+      - name: Configure
+        run: cmake --preset linux-audio
+
+      - name: Build
+        run: cmake --build --preset linux-audio
+
+      - name: Test
+        run: ctest --preset linux-audio
+
   windows:
     name: Windows (MSVC, Debug)
     runs-on: windows-latest

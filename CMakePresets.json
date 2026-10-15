@@ -63,6 +63,16 @@
     },
 
     {
+      "name": "linux-audio",
+      "displayName": "Linux CI + audio module",
+      "description": "Adds decode, playback and analysis. Needs the FFmpeg dev packages",
+      "inherits": "linux-ci",
+      "cacheVariables": {
+        "SPECTRA_ENABLE_AUDIO": "ON"
+      }
+    },
+
+    {
       "name": "windows-debug",
       "displayName": "Windows Debug",
       "inherits": "base",
@@ -88,6 +98,7 @@
     { "name": "linux-release", "configurePreset": "linux-release" },
     { "name": "linux-ci",      "configurePreset": "linux-ci" },
     { "name": "linux-gpu",     "configurePreset": "linux-gpu" },
+    { "name": "linux-audio",   "configurePreset": "linux-audio" },
     { "name": "windows-debug", "configurePreset": "windows-debug" },
     { "name": "windows-release","configurePreset": "windows-release" }
   ],
@@ -104,6 +115,7 @@
     { "name": "linux-release", "configurePreset": "linux-release", "inherits": "base" },
     { "name": "linux-ci",      "configurePreset": "linux-ci",      "inherits": "base" },
     { "name": "linux-gpu",     "configurePreset": "linux-gpu",     "inherits": "base" },
+    { "name": "linux-audio",   "configurePreset": "linux-audio",   "inherits": "base" },
     { "name": "windows-debug", "configurePreset": "windows-debug", "inherits": "base" }
   ]
 }
